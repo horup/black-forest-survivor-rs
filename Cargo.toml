@@ -1,0 +1,10 @@
+[package]
+name = "black-forest-survivor"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+glox = "0.1.5"
+ggsdk = "0.1.10"
+glow = "0.16.0"
+glam = "0.30.9"
