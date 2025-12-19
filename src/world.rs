@@ -1,6 +1,7 @@
 #[derive(Clone, Copy)]
 pub enum ThingVariant {
-    Unknown
+    Unknown,
+    Player,
 }
 impl Default for ThingVariant {
     fn default() -> Self {
