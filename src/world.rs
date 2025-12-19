@@ -30,3 +30,19 @@ pub struct World {
     /// The tiles making up the game world
     pub tiles: endlessgrid::Grid<Tile>,
 }
+
+impl World {
+    pub fn test_world() -> Self {
+        let mut world = World::default();
+
+        // Create a simple test world with some solid and non-solid tiles
+        for x in -10..10 {
+            for y in -10..10 {
+                let solid = (x + y) % 2 == 0; // Checkerboard pattern
+                world.tiles.insert((x, y), Tile { solid });
+            }
+        }
+
+        world
+    }
+}
