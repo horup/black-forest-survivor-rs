@@ -47,17 +47,7 @@ impl ggsdk::GGApp for App {
         self.fps_camera.eye = Vec3::new(2.5, 2.5, 0.5);
 
         g.assets
-            .load::<GGAtlas>("examples/imgs/wall_1x1.png", "wall");
-        g.assets
-            .load::<GGAtlas>("examples/imgs/cross_1x1.png", "cross");
-        g.assets
-            .load::<GGAtlas>("examples/imgs/lamp_1x1.png", "lamp");
-        g.assets
-            .load::<GGAtlas>("examples/imgs/plant_1x1.png", "plant");
-        g.assets
-            .load::<GGAtlas>("examples/imgs/chairs_1x1.png", "chairs");
-        g.assets
-            .load::<GGAtlas>("examples/imgs/player_1x1.png", "player");
+            .load::<GGAtlas>("assets/textures/grass.png", "grass");
     }
 
     fn update(&mut self, g: ggsdk::UpdateContext) {
@@ -178,9 +168,11 @@ impl ggsdk::GGApp for App {
             ChosenCamera::Orbital => &self.orbital_camera,
             ChosenCamera::FirstPerson => &self.fps_camera,
         };
-        let Some(texture) = g.assets.get::<GGAtlas>("wall") else {
+
+        let Some(texture) = g.assets.get::<GGAtlas>("grass") else {
             return;
         };
+
         let texture = g.painter.texture(texture.texture_id()).unwrap();
         let camera_dir = camera.direction();
         let gl = g.painter.gl();
