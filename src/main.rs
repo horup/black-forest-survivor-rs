@@ -180,6 +180,9 @@ impl ggsdk::GGApp for App {
             gl.enable(glow::DEPTH_TEST);
             gl.clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
         }
+
+
+
         // draw walls
         let mut walls = HashMap::new();
         let size = MAP.len();
@@ -215,14 +218,6 @@ impl ggsdk::GGApp for App {
 
         // draw all walls
         let mut draw = self.glox.draw_builder(gl, camera);
-        draw.push_vertices(&glox::plane_vertices(
-            Default::default(),
-            Vec4::new(0.4, 0.4, 0.4, 1.0),
-            1024.0,
-        ));
-        draw.finish();
-
-        let mut draw = self.glox.draw_builder(gl, camera);
         draw.bind_texture(Some(texture));
 
         for (x, y, top) in walls.keys() {
@@ -254,6 +249,19 @@ impl ggsdk::GGApp for App {
                 }
                 let p = Vec3::new(x as f32 + 0.5, y as f32 + 0.5, 1.0);
                 let color = Vec4::new(0.2, 0.2, 0.2, 1.0);
+                draw.push_vertices(&glox::floor_vertices(p, color));
+            }
+        }
+        draw.finish();
+
+
+        // draw floor of block
+        let mut draw = self.glox.draw_builder(gl, camera);
+        draw.bind_texture(Some(texture));
+        for y in 0..size {
+            for x in 0..size {
+                let p = Vec3::new(x as f32 + 0.5, y as f32 + 0.5, 0.0);
+                let color = Vec4::new(1.0, 1.0, 1.0, 1.0);
                 draw.push_vertices(&glox::floor_vertices(p, color));
             }
         }
