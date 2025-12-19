@@ -1,7 +1,11 @@
+mod update;
+pub use update::*;
 mod world;
 pub use world::*;
+mod event;
+pub use event::*;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 
 use ggsdk::{
     GGAtlas, GGRunOptions,
@@ -29,6 +33,8 @@ struct App {
     pub fps_camera: FirstPersonCamera,
     pub chosen_camera: ChosenCamera,
     pub cursor_grab: bool,
+    pub world: World,
+    pub events: VecDeque<Event>,
 }
 
 static MAP: [[u8; 8]; 8] = [
@@ -164,6 +170,9 @@ impl ggsdk::GGApp for App {
                 collision_resolve(&mut self.fps_camera.eye, 0.2, &block_pos, half_size);
             }
         }
+
+        self.events.push_back(Event::Tick(TickEvent { dt: g.dt, d_pad:Vec2::default() }));
+        update::process_events(&mut self.events, &mut self.world);
     }
 
     fn paint_glow(&mut self, g: ggsdk::PaintGlowContext) {

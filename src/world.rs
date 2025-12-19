@@ -1,3 +1,5 @@
+use glam::Vec3;
+
 #[derive(Clone, Copy)]
 pub enum ThingVariant {
     Unknown,
@@ -44,6 +46,7 @@ impl World {
             }
         }
 
+        world.things.insert(Thing { pos: Vec3::default(), variant: ThingVariant::Player });
         world
     }
 }
