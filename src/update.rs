@@ -48,10 +48,16 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut Ctx) {
 
 pub fn restart_system(restart_event: &RestartEvent, ctx: &mut Ctx) {
     ctx.world.clear();
-    ctx.world.things.insert(crate::world::Thing {
+    ctx.push_event(Event::Spawn(crate::event::SpawnEvent {
         pos: glam::Vec3::default(),
         variant: crate::world::ThingVariant::Player,
-    });
+    }));
+}
+
+pub fn generate_map_system(tick_event: &TickEvent, ctx: &mut Ctx) {
+    if let Some(player) = ctx.world.things.get_mut(ctx.world.player) {
+        dbg!("generate map system, moving player to (0,0,0)");
+    }   
 }
 
 pub fn process_events(events: &mut VecDeque<Event>, world: &mut World) {
@@ -65,6 +71,7 @@ pub fn process_events(events: &mut VecDeque<Event>, world: &mut World) {
         };
         match event {
             Event::Tick(tick_event) => {
+                generate_map_system(&tick_event, &mut ctx);
                 input_system(&tick_event, &mut ctx);
                 movement_system(&tick_event, &mut ctx);
             },
