@@ -87,49 +87,44 @@ impl ggsdk::GGApp for App {
             gl.clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
         }
 
-        // draw floor of block
+        // draw tile
         let mut draw = self.glox.draw_builder(gl, camera);
         let player_pos = Vec2::default().as_ivec2();
         let size = 8;
         draw.bind_texture(Some(texture));
         for y in -size / 2..size / 2 {
             for x in -size / 2..size / 2 {
-                let cell = player_pos + Vec2::new(x as f32, y as f32).as_ivec2();
-                let p = Vec3::new(cell.x as f32 + 0.5, cell.y as f32 + 0.5, 0.0);
-                let color = Vec4::new(1.0, 1.0, 1.0, 1.0);
-                draw.push_vertices(&glox::floor_vertices(p, color));
+                if let Some(tile) = self.world.tiles.get(player_pos + Vec2::new(x as f32, y as f32).as_ivec2()) {
+                    let cell = player_pos + Vec2::new(x as f32, y as f32).as_ivec2();
+                    let p = Vec3::new(cell.x as f32 + 0.5, cell.y as f32 + 0.5, 0.0);
+                    let color = Vec4::new(1.0, 1.0, 1.0, 1.0);
+                    draw.push_vertices(&glox::floor_vertices(p, color));
+                }
             }
         }
         draw.finish();
 
         // draw some sprites / billboards
-        for y in 0..size {
-            for x in 0..size {
-                let mut draw = self.glox.draw_builder(gl, camera);
-                //draw.bind_texture(Some(texture));
-                let id = 2;
-                let texture = match id {
-                    2 => "cross",
-                    3 => "plant",
-                    4 => "chairs",
-                    5 => "lamp",
-                    _ => {
-                        continue;
-                    }
-                };
-                if let Some(atlas) = g.assets.get::<GGAtlas>(texture) {
-                    let texture = g.painter.texture(atlas.texture_id()).unwrap();
-                    draw.bind_texture(texture.into());
+        for thing in self.world.things.values() {
+            let mut draw = self.glox.draw_builder(gl, camera);
+            let texture = match thing.variant {
+                ThingVariant::Player => "grass",
+                _ => {
+                    continue;
                 }
-                let p = Vec3::new(x as f32 + 0.5, y as f32 + 0.5, 0.0);
-                draw.push_vertices(&glox::billboard_vertices(
-                    p,
-                    Vec4::splat(1.0),
-                    camera_dir,
-                    Vec2::splat(1.0),
-                ));
-                draw.finish();
+            };
+            if let Some(atlas) = g.assets.get::<GGAtlas>(texture) {
+                let texture = g.painter.texture(atlas.texture_id()).unwrap();
+                draw.bind_texture(texture.into());
             }
+            let p = thing.pos;
+            draw.push_vertices(&glox::billboard_vertices(
+                p,
+                Vec4::splat(1.0),
+                camera_dir,
+                Vec2::splat(1.0),
+            ));
+            draw.finish();
         }
 
         self.glox.swap();
