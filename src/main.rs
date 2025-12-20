@@ -26,7 +26,7 @@ struct App {
 impl ggsdk::GGApp for App {
     fn init(&mut self, g: ggsdk::InitContext) {
         self.glox.init(g.gl);
-        self.fps_camera.eye = Vec3::new(2.5, 2.5, 0.5);
+        self.fps_camera.eye = Vec3::new(0.0, 0.0, 0.5);
 
         g.assets
             .load::<GGAtlas>("assets/textures/grass.png", "grass");
@@ -74,6 +74,9 @@ impl ggsdk::GGApp for App {
     }
 
     fn paint_glow(&mut self, g: ggsdk::PaintGlowContext) {
+        if let Some(player) = self.world.things.get(self.world.player) {
+            self.fps_camera.eye = player.pos + Vec3::new(0.0, 0.0, 0.5);
+        }
         let camera: &dyn Camera = &self.fps_camera;
         let Some(texture) = g.assets.get::<GGAtlas>("grass") else {
             return;
