@@ -41,4 +41,12 @@ impl World {
         self.things.clear();
         self.tiles = Default::default();
     }
+
+    pub fn player_mut(&mut self) -> Option<&mut Thing> {
+        self.things.get_mut(self.player)
+    }
+
+    pub fn player(&self) -> Option<&Thing> {
+        self.things.get(self.player)
+    }
 }

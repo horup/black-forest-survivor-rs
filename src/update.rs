@@ -15,7 +15,13 @@ impl<'a> Ctx<'a> {
 
 /// handles inputs from player
 pub fn input_system(tick_event: &TickEvent, ctx: &mut Ctx) {
-    dbg!("input system dt: {}", tick_event.dt);
+    if let Some(player) = ctx.world.player_mut() {
+        let speed = 5.0;
+        let forward = glam::Vec3::new(0.0, 1.0, 0.0);
+        let right = glam::Vec3::new(1.0, 0.0, 0.0);
+        let movement = (forward * tick_event.d_pad.y + right * tick_event.d_pad.x) * speed * tick_event.dt;
+        player.pos += movement;
+    }
 }
 
 /// handles movement of things in the world
