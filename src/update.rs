@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::{CollisionEvent, TickEvent, World, event::Event};
+use crate::{CollisionEvent, RestartEvent, TickEvent, World, event::Event};
 
 pub struct Ctx<'a> {
     pub world: &'a mut World,
@@ -31,6 +31,29 @@ pub fn collision_system(collision_event: &CollisionEvent, ctx: &mut Ctx) {
     dbg!("collision system between {} and {}", collision_event.entity_1_id, collision_event.entity_2_id);
 }
 
+pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut Ctx) {
+    let id = ctx.world.things.insert(crate::world::Thing {
+        pos: spawn_event.pos,
+        variant: spawn_event.variant,
+    });
+
+    match spawn_event.variant {
+        crate::world::ThingVariant::Player => {
+            // set player entity id
+            ctx.world.player = id;
+        },
+        _ => {}
+    }
+}
+
+pub fn restart_system(restart_event: &RestartEvent, ctx: &mut Ctx) {
+    ctx.world.clear();
+    ctx.world.things.insert(crate::world::Thing {
+        pos: glam::Vec3::default(),
+        variant: crate::world::ThingVariant::Player,
+    });
+}
+
 pub fn process_events(events: &mut VecDeque<Event>, world: &mut World) {
     while let Some(event) = events.pop_front() {
         let mut push_event = |e: Event| {
@@ -47,6 +70,12 @@ pub fn process_events(events: &mut VecDeque<Event>, world: &mut World) {
             },
             Event::Collision(collision_event) => {
                 collision_system(&collision_event, &mut ctx);
+            },
+            Event::Restart(restart_event) => {
+                restart_system(&restart_event, &mut ctx);
+            },
+            Event::Spawn(spawn_event) => {
+                spawn_system(&spawn_event, &mut ctx);
             },
         }
     }

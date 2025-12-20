@@ -32,21 +32,13 @@ pub struct World {
     pub things: slotmap::SlotMap<slotmap::DefaultKey, Thing>,
     /// The tiles making up the game world
     pub tiles: endlessgrid::Grid<Tile>,
+    /// The players entity id
+    pub player: slotmap::DefaultKey,
 }
 
 impl World {
-    pub fn test_world() -> Self {
-        let mut world = World::default();
-
-        // Create a simple test world with some solid and non-solid tiles
-        for x in -10..10 {
-            for y in -10..10 {
-                let solid = (x + y) % 2 == 0; // Checkerboard pattern
-                world.tiles.insert((x, y), Tile { solid });
-            }
-        }
-
-        world.things.insert(Thing { pos: Vec3::default(), variant: ThingVariant::Player });
-        world
+    pub fn clear(&mut self) {
+        self.things.clear();
+        self.tiles = Default::default();
     }
 }
