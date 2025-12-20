@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::{CollisionEvent, RestartEvent, TickEvent, World, event::Event};
+use crate::{CollisionEvent, RestartEvent, TickEvent, Tile, World, event::Event};
 
 pub struct Ctx<'a> {
     pub world: &'a mut World,
@@ -28,7 +28,11 @@ pub fn movement_system(tick_event: &TickEvent, ctx: &mut Ctx) {
 }
 
 pub fn collision_system(collision_event: &CollisionEvent, ctx: &mut Ctx) {
-    dbg!("collision system between {} and {}", collision_event.entity_1_id, collision_event.entity_2_id);
+    dbg!(
+        "collision system between {} and {}",
+        collision_event.entity_1_id,
+        collision_event.entity_2_id
+    );
 }
 
 pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut Ctx) {
@@ -41,12 +45,12 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut Ctx) {
         crate::world::ThingVariant::Player => {
             // set player entity id
             ctx.world.player = id;
-        },
+        }
         _ => {}
     }
 }
 
-pub fn restart_system(restart_event: &RestartEvent, ctx: &mut Ctx) {
+pub fn restart_system(_: &RestartEvent, ctx: &mut Ctx) {
     ctx.world.clear();
     ctx.push_event(Event::Spawn(crate::event::SpawnEvent {
         pos: glam::Vec3::default(),
@@ -54,13 +58,22 @@ pub fn restart_system(restart_event: &RestartEvent, ctx: &mut Ctx) {
     }));
 }
 
-pub fn generate_map_system(tick_event: &TickEvent, ctx: &mut Ctx) {
+pub fn generate_map_system(_: &TickEvent, ctx: &mut Ctx) {
     if let Some(player) = ctx.world.things.get_mut(ctx.world.player) {
-        dbg!("generate map system, moving player to (0,0,0)");
-    }   
+        let grid_pos = player.pos.truncate().as_ivec2();
+        let s = 16;
+        for y in -s..=s {
+            for x in -s..=s {
+                let cell = grid_pos + glam::IVec2::new(x, y);
+                if ctx.world.tiles.get(cell).is_none() {
+                    ctx.world.tiles.insert(cell, Tile { solid: false });
+                }
+            }
+        }
+    }
 }
 
-pub fn process_events(events: &mut VecDeque<Event>, world: &mut World) {
+pub fn process(events: &mut VecDeque<Event>, world: &mut World) {
     while let Some(event) = events.pop_front() {
         let mut push_event = |e: Event| {
             events.push_back(e);
@@ -74,16 +87,16 @@ pub fn process_events(events: &mut VecDeque<Event>, world: &mut World) {
                 generate_map_system(&tick_event, &mut ctx);
                 input_system(&tick_event, &mut ctx);
                 movement_system(&tick_event, &mut ctx);
-            },
+            }
             Event::Collision(collision_event) => {
                 collision_system(&collision_event, &mut ctx);
-            },
+            }
             Event::Restart(restart_event) => {
                 restart_system(&restart_event, &mut ctx);
-            },
+            }
             Event::Spawn(spawn_event) => {
                 spawn_system(&spawn_event, &mut ctx);
-            },
+            }
         }
     }
 }

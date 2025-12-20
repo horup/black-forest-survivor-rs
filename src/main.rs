@@ -70,7 +70,7 @@ impl ggsdk::GGApp for App {
         });
 
         self.events.push_back(Event::Tick(TickEvent { dt: g.dt, d_pad }));
-        update::process_events(&mut self.events, &mut self.world);
+        update::process(&mut self.events, &mut self.world);
     }
 
     fn paint_glow(&mut self, g: ggsdk::PaintGlowContext) {
