@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::{CollisionEvent, RestartEvent, TickEvent, Tile, World, event::Event};
+use crate::{CollisionEvent, PlayerInputEvent, RestartEvent, Thing, TickEvent, Tile, World, event::Event};
 
 pub struct Ctx<'a> {
     pub world: &'a mut World,
@@ -13,20 +13,22 @@ impl<'a> Ctx<'a> {
     }
 }
 
-/// handles inputs from player
-pub fn input_system(tick_event: &TickEvent, ctx: &mut Ctx) {
-    if let Some(player) = ctx.world.player_mut() {
-        let speed = 5.0;
-        let forward = glam::Vec3::new(0.0, 1.0, 0.0);
-        let right = glam::Vec3::new(1.0, 0.0, 0.0);
-        let movement = (forward * tick_event.d_pad.y + right * tick_event.d_pad.x) * speed * tick_event.dt;
-        player.pos += movement;
+/// handles inputs for things in the world
+pub fn input_system(e: &PlayerInputEvent, ctx: &mut Ctx) {
+    if let Some(thing) = ctx.world.things.get_mut(e.player_id) {
+        thing.move_dir = e.move_dir;
+        thing.facing = e.facing;
     }
 }
 
 /// handles movement of things in the world
 pub fn movement_system(tick_event: &TickEvent, ctx: &mut Ctx) {
-    dbg!("movement system dt: {}", tick_event.dt);
+    let dt = tick_event.dt;
+
+    let max_speed = 5.0;
+    for (_id, thing) in ctx.world.things.iter_mut() {
+        thing.pos += thing.move_dir * dt * max_speed;
+    }
     ctx.push_event(Event::Collision(CollisionEvent {
         entity_1_id: 1,
         entity_2_id: 2,
@@ -42,9 +44,11 @@ pub fn collision_system(collision_event: &CollisionEvent, ctx: &mut Ctx) {
 }
 
 pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut Ctx) {
-    let id = ctx.world.things.insert(crate::world::Thing {
+    let id = ctx.world.things.insert(Thing {
         pos: spawn_event.pos,
         variant: spawn_event.variant,
+        move_dir: Default::default(),
+        facing: 0.0,
     });
 
     match spawn_event.variant {
@@ -91,7 +95,6 @@ pub fn process(events: &mut VecDeque<Event>, world: &mut World) {
         match event {
             Event::Tick(tick_event) => {
                 generate_map_system(&tick_event, &mut ctx);
-                input_system(&tick_event, &mut ctx);
                 movement_system(&tick_event, &mut ctx);
             }
             Event::Collision(collision_event) => {
@@ -103,6 +106,9 @@ pub fn process(events: &mut VecDeque<Event>, world: &mut World) {
             Event::Spawn(spawn_event) => {
                 spawn_system(&spawn_event, &mut ctx);
             }
+            Event::PlayerInput(player_input_event) => {
+                input_system(&player_input_event, &mut ctx);
+            },
         }
     }
 }

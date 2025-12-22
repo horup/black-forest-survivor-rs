@@ -32,6 +32,7 @@ impl ggsdk::GGApp for App {
             .load::<GGAtlas>("assets/textures/grass.png", "grass");
 
         self.events.push_front(Event::Restart(RestartEvent {  }));
+        
     }
 
     fn update(&mut self, g: ggsdk::UpdateContext) {
@@ -39,37 +40,45 @@ impl ggsdk::GGApp for App {
     }
 
     fn update_glow(&mut self, g: ggsdk::UpdateContext) {
-        let mut d_pad = Vec2::new(0.0, 0.0);
-        let mut rot = 0.0;
+        let mut move_dir = Vec2::new(0.0, 0.0);
         let mut pointer_delta = Vec2::new(0.0, 0.0);
         g.egui_ctx.input(|x| {
             let r = x.content_rect();
             self.fps_camera.viewport_size = Vec2::new(r.width(), r.height());
 
             if x.key_down(Key::W) {
-                d_pad.y = 1.0;
+                move_dir.y = 1.0;
             }
             if x.key_down(Key::S) {
-                d_pad.y = -1.0;
+                move_dir.y = -1.0;
             }
             if x.key_down(Key::A) {
-                d_pad.x = -1.0;
+                move_dir.x = -1.0;
             }
             if x.key_down(Key::D) {
-                d_pad.x = 1.0;
-            }
-            if x.key_down(Key::Q) {
-                rot = -1.0;
-            }
-            if x.key_down(Key::E) {
-                rot = 1.0;
+                move_dir.x = 1.0;
             }
 
             let delta = x.pointer.motion().unwrap_or_default();
             pointer_delta = Vec2::new(delta.x, delta.y);
+
+            let spd = 10.0;
+            if x.key_down(Key::Q) {
+                pointer_delta.x -= spd;
+            } 
+            if x.key_down(Key::E) {
+                pointer_delta.x += spd;
+            }
         });
 
-        self.events.push_back(Event::Tick(TickEvent { dt: g.dt, d_pad }));
+        let current_camera_pos = self.fps_camera.eye;
+        self.fps_camera.move_self_horizontal(move_dir.extend(0.0));
+        let new_camera_pos = self.fps_camera.eye;
+        self.fps_camera.change_yaw(-pointer_delta.x / 100.0);
+        let facing = self.fps_camera.yaw();
+        let move_dir = new_camera_pos - current_camera_pos;
+        self.events.push_back(Event::PlayerInput(PlayerInputEvent { player_id: self.world.player, move_dir:move_dir.normalize_or_zero(), facing }));
+        self.events.push_back(Event::Tick(TickEvent { dt: g.dt }));
         update::process(&mut self.events, &mut self.world);
     }
 

@@ -18,6 +18,13 @@ pub struct Thing {
 
     /// Variant of this thing, such as a player, monster, item, etc. 
     pub variant: ThingVariant,
+
+    /// Movement direction of this thing
+    /// Normalized from 0..1
+    pub move_dir: Vec3,
+
+    /// Facing direction in radians
+    pub facing: f32,
 }
 
 #[derive(Clone, Default)]

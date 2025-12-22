@@ -1,4 +1,5 @@
 use glam::{Vec2, Vec3};
+use slotmap::DefaultKey;
 
 use crate::ThingVariant;
 
@@ -7,11 +8,22 @@ pub enum Event {
     Collision(CollisionEvent),
     Restart(RestartEvent),
     Spawn(SpawnEvent),
+    PlayerInput(PlayerInputEvent),
+}
+
+pub struct PlayerInputEvent {
+    pub player_id: DefaultKey,
+    
+    /// directional movement input
+    /// normalized from 0..1
+    pub move_dir: Vec3,
+
+    /// facing direction in radians
+    pub facing: f32,
 }
 
 pub struct TickEvent {
     pub dt:f32,
-    pub d_pad:Vec2
 }
 
 pub struct CollisionEvent {
