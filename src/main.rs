@@ -8,8 +8,7 @@ pub use event::*;
 use std::collections::{HashMap, VecDeque};
 
 use ggsdk::{
-    GGAtlas, GGRunOptions,
-    egui::{self, Align2, Color32, FontId, Key, LayerId},
+    GGAtlas, GGPainter, GGRunOptions, egui::{self, Align2, Color32, FontId, Key, LayerId, Pos2, Rect}
 };
 use glam::{IVec2, Vec2, Vec3, Vec4};
 use glow::HasContext;
@@ -30,13 +29,32 @@ impl ggsdk::GGApp for App {
 
         g.assets
             .load::<GGAtlas>("assets/textures/grass.png", "grass");
+        g.assets
+            .load::<GGAtlas>("assets/textures/torch.png", "torch");
+        g.assets
+            .load::<GGAtlas>("assets/textures/axe.png", "axe");
 
-        self.events.push_front(Event::Restart(RestartEvent {  }));
-        
+        self.events.push_front(Event::Restart(RestartEvent {}));
     }
 
     fn update(&mut self, g: ggsdk::UpdateContext) {
         let painter = g.egui_ctx.layer_painter(LayerId::background());
+
+
+        let Some(torch) = g.assets.get::<GGAtlas>("torch") else { return ;};
+        let screen_size = g.egui_ctx.input(|i| i.content_rect().size());
+
+        let h= screen_size.y;
+        let w = h / 2.0;
+
+        painter.atlas(&torch, 0, Rect::from_min_max(Pos2::new(0.0, 0.0), Pos2::new(w, screen_size.y)), Color32::WHITE);
+
+
+        let Some(axe) = g.assets.get::<GGAtlas>("axe") else { return ;};
+        let screen_size = g.egui_ctx.input(|i| i.content_rect().size());
+        let h= screen_size.y;
+        let w = h / 2.0;
+        painter.atlas(&axe, 0, Rect::from_min_max(Pos2::new(screen_size.x - w, 0.0), Pos2::new(screen_size.x, screen_size.y)), Color32::WHITE);
     }
 
     fn update_glow(&mut self, g: ggsdk::UpdateContext) {
@@ -65,7 +83,7 @@ impl ggsdk::GGApp for App {
             let spd = 10.0;
             if x.key_down(Key::Q) {
                 pointer_delta.x -= spd;
-            } 
+            }
             if x.key_down(Key::E) {
                 pointer_delta.x += spd;
             }
@@ -77,13 +95,19 @@ impl ggsdk::GGApp for App {
         self.fps_camera.change_yaw(-pointer_delta.x / 100.0);
         let facing = self.fps_camera.yaw();
         let move_dir = new_camera_pos - current_camera_pos;
-        self.events.push_back(Event::PlayerInput(PlayerInputEvent { player_id: self.world.player, move_dir:move_dir.normalize_or_zero(), facing }));
+        self.events.push_back(Event::PlayerInput(PlayerInputEvent {
+            player_id: self.world.player,
+            move_dir: move_dir.normalize_or_zero(),
+            facing,
+        }));
         self.events.push_back(Event::Tick(TickEvent { dt: g.dt }));
         update::process(&mut self.events, &mut self.world);
     }
 
     fn paint_glow(&mut self, g: ggsdk::PaintGlowContext) {
-        let Some(player) = self.world.things.get(self.world.player) else { return };
+        let Some(player) = self.world.things.get(self.world.player) else {
+            return;
+        };
         self.fps_camera.eye = player.pos + Vec3::new(0.0, 0.0, 0.5);
         let player_tile_pos = player.tile_pos();
         let camera: &dyn Camera = &self.fps_camera;
