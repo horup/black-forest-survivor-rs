@@ -103,13 +103,18 @@ impl ggsdk::GGApp for App {
         let mut draw = self.glox.draw_builder(gl, camera);
         let size = 8;
         draw.bind_texture(Some(texture));
-        for y in -size / 2..size / 2 {
-            for x in -size / 2..size / 2 {
+        for y in -size..size {
+            for x in -size..size {
                 let tile_index = player_tile_pos + IVec2::new(x, y);
                 if let Some(_) = self.world.tiles.get(tile_index) {
                     let cell = player_tile_pos + Vec2::new(x as f32, y as f32).as_ivec2();
                     let p = Vec3::new(cell.x as f32 + 0.5, cell.y as f32 + 0.5, 0.0);
-                    let color = Vec4::new(1.0, 1.0, 1.0, 1.0);
+
+                    let d = p - player.pos;
+                    let d = d.length();
+                    let d = d / size as f32;
+                    let d = 1.0 - d;
+                    let color = Vec4::new(d, d, d, 1.0);
                     draw.push_vertices(&glox::floor_vertices(p, color));
                 }
             }
