@@ -27,6 +27,12 @@ pub struct Thing {
     pub facing: f32,
 }
 
+impl Thing {
+    pub fn tile_pos(&self) -> glam::IVec2 {
+        glam::IVec2::new(self.pos.x as i32, self.pos.y as i32)
+    }
+}
+
 #[derive(Clone, Default)]
 pub struct Tile {
     /// Whether this tile is solid (i.e., impassable)

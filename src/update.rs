@@ -36,11 +36,7 @@ pub fn movement_system(tick_event: &TickEvent, ctx: &mut Ctx) {
 }
 
 pub fn collision_system(collision_event: &CollisionEvent, ctx: &mut Ctx) {
-    dbg!(
-        "collision system between {} and {}",
-        collision_event.entity_1_id,
-        collision_event.entity_2_id
-    );
+   
 }
 
 pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut Ctx) {
@@ -77,6 +73,7 @@ pub fn generate_map_system(_: &TickEvent, ctx: &mut Ctx) {
                 let cell = grid_pos + glam::IVec2::new(x, y);
                 if ctx.world.tiles.get(cell).is_none() {
                     ctx.world.tiles.insert(cell, Tile { solid: false });
+                    dbg!("some tile");
                 }
             }
         }

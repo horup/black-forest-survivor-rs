@@ -11,7 +11,7 @@ use ggsdk::{
     GGAtlas, GGRunOptions,
     egui::{self, Align2, Color32, FontId, Key, LayerId},
 };
-use glam::{Vec2, Vec3, Vec4};
+use glam::{IVec2, Vec2, Vec3, Vec4};
 use glow::HasContext;
 use glox::{Camera, FirstPersonCamera, Glox};
 
@@ -83,9 +83,9 @@ impl ggsdk::GGApp for App {
     }
 
     fn paint_glow(&mut self, g: ggsdk::PaintGlowContext) {
-        if let Some(player) = self.world.things.get(self.world.player) {
-            self.fps_camera.eye = player.pos + Vec3::new(0.0, 0.0, 0.5);
-        }
+        let Some(player) = self.world.things.get(self.world.player) else { return };
+        self.fps_camera.eye = player.pos + Vec3::new(0.0, 0.0, 0.5);
+        let player_tile_pos = player.tile_pos();
         let camera: &dyn Camera = &self.fps_camera;
         let Some(texture) = g.assets.get::<GGAtlas>("grass") else {
             return;
@@ -101,13 +101,13 @@ impl ggsdk::GGApp for App {
 
         // draw tile
         let mut draw = self.glox.draw_builder(gl, camera);
-        let player_pos = Vec2::default().as_ivec2();
         let size = 8;
         draw.bind_texture(Some(texture));
         for y in -size / 2..size / 2 {
             for x in -size / 2..size / 2 {
-                if let Some(tile) = self.world.tiles.get(player_pos + Vec2::new(x as f32, y as f32).as_ivec2()) {
-                    let cell = player_pos + Vec2::new(x as f32, y as f32).as_ivec2();
+                let tile_index = player_tile_pos + IVec2::new(x, y);
+                if let Some(_) = self.world.tiles.get(tile_index) {
+                    let cell = player_tile_pos + Vec2::new(x as f32, y as f32).as_ivec2();
                     let p = Vec3::new(cell.x as f32 + 0.5, cell.y as f32 + 0.5, 0.0);
                     let color = Vec4::new(1.0, 1.0, 1.0, 1.0);
                     draw.push_vertices(&glox::floor_vertices(p, color));
