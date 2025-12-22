@@ -73,7 +73,6 @@ pub fn generate_map_system(_: &TickEvent, ctx: &mut Ctx) {
                 let cell = grid_pos + glam::IVec2::new(x, y);
                 if ctx.world.tiles.get(cell).is_none() {
                     ctx.world.tiles.insert(cell, Tile { solid: false });
-                    dbg!("some tile");
                 }
             }
         }
