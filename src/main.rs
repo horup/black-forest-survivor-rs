@@ -190,6 +190,7 @@ fn main() {
     ggsdk::GGEngine::run(
         app,
         GGRunOptions {
+            window_initial_size: Some((1280.0, 720.0)),
             ..Default::default()
         },
     );
