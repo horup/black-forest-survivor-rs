@@ -5,7 +5,7 @@ pub use world::*;
 mod event;
 pub use event::*;
 
-use std::collections::{HashMap, VecDeque};
+use std::{cell::RefCell, collections::{HashMap, VecDeque}};
 
 use ggsdk::{
     GGAtlas, GGPainter, GGRunOptions, egui::{self, Align2, Color32, FontId, Key, LayerId, Pos2, Rect}
@@ -19,7 +19,12 @@ struct App {
     pub glox: Glox,
     pub fps_camera: FirstPersonCamera,
     pub world: World,
-    pub events: VecDeque<Event>,
+}
+
+impl Ctx for App {
+    fn world_mut(&mut self) -> &mut World {
+        &mut self.world
+    }
 }
 
 impl ggsdk::GGApp for App {
@@ -34,7 +39,7 @@ impl ggsdk::GGApp for App {
         g.assets
             .load::<GGAtlas>("assets/textures/axe.png", "axe");
 
-        self.events.push_front(Event::Restart(RestartEvent {}));
+        self.world.events.push_front(Event::Restart(RestartEvent {}));
     }
 
     fn update(&mut self, g: ggsdk::UpdateContext) {
@@ -95,13 +100,13 @@ impl ggsdk::GGApp for App {
         self.fps_camera.change_yaw(-pointer_delta.x / 100.0);
         let facing = self.fps_camera.yaw();
         let move_dir = new_camera_pos - current_camera_pos;
-        self.events.push_back(Event::PlayerInput(PlayerInputEvent {
+        self.world.events.push_back(Event::PlayerInput(PlayerInputEvent {
             player_id: self.world.player,
             move_dir: move_dir.normalize_or_zero(),
             facing,
         }));
-        self.events.push_back(Event::Tick(TickEvent { dt: g.dt }));
-        update::process(&mut self.events, &mut self.world);
+        self.world.events.push_back(Event::Tick(TickEvent { dt: g.dt }));
+        update::process(self);
     }
 
     fn paint_glow(&mut self, g: ggsdk::PaintGlowContext) {

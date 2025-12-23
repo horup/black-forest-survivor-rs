@@ -1,4 +1,8 @@
+use std::collections::VecDeque;
+
 use glam::Vec3;
+
+use crate::Event;
 
 #[derive(Clone, Copy)]
 pub enum ThingVariant {
@@ -47,6 +51,9 @@ pub struct World {
     pub tiles: endlessgrid::Grid<Tile>,
     /// The players entity id
     pub player: slotmap::DefaultKey,
+
+    /// Unprocessed events
+    pub events:VecDeque<Event>
 }
 
 impl World {
