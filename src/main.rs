@@ -43,6 +43,8 @@ impl ggsdk::GGApp for App {
             .load::<GGAtlas>("assets/textures/torch.png", "torch");
         g.assets
             .load::<GGAtlas>("assets/textures/axe.png", "axe");
+        g.assets
+            .load::<GGAtlas>("assets/textures/tree.png", "tree");
 
         self.world.events.push_front(Event::Restart(RestartEvent {}));
     }
@@ -161,7 +163,7 @@ impl ggsdk::GGApp for App {
             let texture = match thing.variant {
                 ThingVariant::Player => "grass",
                 _ => {
-                    "grass"
+                    "tree"
                 }
                 
             };
