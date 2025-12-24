@@ -5,6 +5,10 @@ pub trait Ctx {
     fn push_event(&mut self, event: Event) {
         self.world_mut().events.push_back(event);
     }
+    fn rand_u32(&mut self) -> u32;
+    fn rand_unsigned(&mut self, max: u32) -> u32 {
+        self.rand_u32() % max
+    }
 }
 
 
@@ -69,6 +73,18 @@ pub fn generate_map_system(_: &TickEvent, ctx: &mut dyn Ctx) {
                 let cell = grid_pos + glam::IVec2::new(x, y);
                 if ctx.world_mut().tiles.get(cell).is_none() {
                     ctx.world_mut().tiles.insert(cell, Tile { solid: false });
+                    let r = ctx.rand_unsigned(6);
+                    if r == 0 {
+                        // spawn a tree
+                        ctx.push_event(Event::Spawn(crate::event::SpawnEvent {
+                            pos: glam::Vec3::new(
+                                cell.x as f32 + 0.5,
+                                cell.y as f32 + 0.5,
+                                0.0,
+                            ),
+                            variant: crate::world::ThingVariant::Unknown,
+                        }));
+                    }
                 }
             }
         }

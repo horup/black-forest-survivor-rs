@@ -1,4 +1,5 @@
 mod update;
+use shufflebag::ShuffleBag;
 pub use update::*;
 mod world;
 pub use world::*;
@@ -24,6 +25,10 @@ struct App {
 impl Ctx for App {
     fn world_mut(&mut self) -> &mut World {
         &mut self.world
+    }
+    
+    fn rand_u32(&mut self) -> u32 {
+        rand::random::<u32>()
     }
 }
 
@@ -156,8 +161,9 @@ impl ggsdk::GGApp for App {
             let texture = match thing.variant {
                 ThingVariant::Player => "grass",
                 _ => {
-                    continue;
+                    "grass"
                 }
+                
             };
             if let Some(atlas) = g.assets.get::<GGAtlas>(texture) {
                 let texture = g.painter.texture(atlas.texture_id()).unwrap();
