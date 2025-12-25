@@ -82,7 +82,7 @@ pub fn generate_map_system(_: &TickEvent, ctx: &mut dyn Ctx) {
                                 cell.y as f32 + 0.5,
                                 0.0,
                             ),
-                            variant: crate::world::ThingVariant::Unknown,
+                            variant: crate::world::ThingVariant::Tree,
                         }));
                     }
                 }

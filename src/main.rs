@@ -1,19 +1,17 @@
 mod update;
-use shufflebag::ShuffleBag;
 pub use update::*;
 mod world;
 pub use world::*;
 mod event;
 pub use event::*;
-
-use std::{cell::RefCell, collections::{HashMap, VecDeque}};
+mod render;
+pub use render::*;
 
 use ggsdk::{
-    GGAtlas, GGPainter, GGRunOptions, egui::{self, Align2, Color32, FontId, Key, LayerId, Pos2, Rect}
+    GGAtlas, GGRunOptions, egui::Key
 };
-use glam::{IVec2, Vec2, Vec3, Vec4};
-use glow::HasContext;
-use glox::{Camera, FirstPersonCamera, Glox};
+use glam::{Vec2, Vec3};
+use glox::{FirstPersonCamera, Glox};
 
 #[derive(Default)]
 struct App {
@@ -50,23 +48,7 @@ impl ggsdk::GGApp for App {
     }
 
     fn update(&mut self, g: ggsdk::UpdateContext) {
-        let painter = g.egui_ctx.layer_painter(LayerId::background());
-
-
-        let Some(torch) = g.assets.get::<GGAtlas>("torch") else { return ;};
-        let screen_size = g.egui_ctx.input(|i| i.content_rect().size());
-
-        let h= screen_size.y;
-        let w = h / 2.0;
-
-        painter.atlas(&torch, 0, Rect::from_min_max(Pos2::new(0.0, 0.0), Pos2::new(w, screen_size.y)), Color32::WHITE);
-
-
-        let Some(axe) = g.assets.get::<GGAtlas>("axe") else { return ;};
-        let screen_size = g.egui_ctx.input(|i| i.content_rect().size());
-        let h= screen_size.y;
-        let w = h / 2.0;
-        painter.atlas(&axe, 0, Rect::from_min_max(Pos2::new(screen_size.x - w, 0.0), Pos2::new(screen_size.x, screen_size.y)), Color32::WHITE);
+        render::render_ui(&g);
     }
 
     fn update_glow(&mut self, g: ggsdk::UpdateContext) {
@@ -122,89 +104,8 @@ impl ggsdk::GGApp for App {
         };
         let player_pos = player.pos;
         self.fps_camera.eye = player_pos + Vec3::new(0.0, 0.0, 0.5);
-        let player_tile_pos = player.tile_pos();
-        let camera: &dyn Camera = &self.fps_camera;
-        let Some(texture) = g.assets.get::<GGAtlas>("grass") else {
-            return;
-        };
-
-        let texture = g.painter.texture(texture.texture_id()).unwrap();
-        let camera_dir = camera.direction();
-        let gl = g.painter.gl();
-        unsafe {
-            gl.enable(glow::DEPTH_TEST);
-            gl.clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
-        }
-
-        let max_distance = 8;
-        let light = |d:f32| {
-            let d = d / max_distance as f32;
-            let d = 1.0 - d;
-            if d < 0.0 {
-                0.0
-            } else if d > 1.0{
-                1.0
-            } else {
-                d
-            }
-        };
-
-        // draw tile
-        let mut draw = self.glox.draw_builder(gl, camera);
-       
-        draw.bind_texture(Some(texture));
-        for y in -max_distance..max_distance {
-            for x in -max_distance..max_distance {
-                let tile_index = player_tile_pos + IVec2::new(x, y);
-                if let Some(_) = self.world.tiles.get(tile_index) {
-                    let cell = player_tile_pos + Vec2::new(x as f32, y as f32).as_ivec2();
-                    let p = Vec3::new(cell.x as f32 + 0.5, cell.y as f32 + 0.5, 0.0);
-                    let d = p - player_pos;
-                    let d = d.length();
-                    let d = light(d);
-                    let color = Vec4::new(d, d, d, 1.0);
-                    draw.push_vertices(&glox::floor_vertices(p, color));
-                }
-            }
-        }
-        draw.finish();
-
-        // draw some sprites / billboards
-        for thing in self.world.things.values() {
-            let mut draw = self.glox.draw_builder(gl, camera);
-            let texture = match thing.variant {
-                ThingVariant::Player => "grass",
-                _ => {
-                    "tree"
-                }
-                
-            };
-            let scaling_factor = match thing.variant {
-                ThingVariant::Unknown => Vec2::new(1.0, 2.0),
-                _ => {
-                    Vec2::splat(1.0)
-                }
-                
-            };
-            if let Some(atlas) = g.assets.get::<GGAtlas>(texture) {
-                let texture = g.painter.texture(atlas.texture_id()).unwrap();
-                draw.bind_texture(texture.into());
-            }
-            let p = thing.pos;
-            let d = p - player_pos;
-            let d = d.length();
-            let d = light(d);
-            let color = Vec4::new(d, d, d, 1.0);
-            draw.push_vertices(&glox::billboard_vertices(
-                p,
-                color,
-                camera_dir,
-                scaling_factor,
-            ));
-            draw.finish();
-        }
-
-        self.glox.swap();
+        
+        render::render_3d_world(&self.world, &self.fps_camera, &mut self.glox, &g);
     }
 }
 

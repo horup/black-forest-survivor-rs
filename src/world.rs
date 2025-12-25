@@ -8,6 +8,7 @@ use crate::Event;
 pub enum ThingVariant {
     Unknown,
     Player,
+    Tree
 }
 impl Default for ThingVariant {
     fn default() -> Self {
