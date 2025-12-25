@@ -167,6 +167,13 @@ impl ggsdk::GGApp for App {
                 }
                 
             };
+            let scaling_factor = match thing.variant {
+                ThingVariant::Unknown => Vec2::new(1.0, 2.0),
+                _ => {
+                    Vec2::splat(1.0)
+                }
+                
+            };
             if let Some(atlas) = g.assets.get::<GGAtlas>(texture) {
                 let texture = g.painter.texture(atlas.texture_id()).unwrap();
                 draw.bind_texture(texture.into());
@@ -176,7 +183,7 @@ impl ggsdk::GGApp for App {
                 p,
                 Vec4::splat(1.0),
                 camera_dir,
-                Vec2::splat(1.0),
+                scaling_factor,
             ));
             draw.finish();
         }
