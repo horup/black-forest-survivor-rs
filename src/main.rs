@@ -6,6 +6,10 @@ mod event;
 pub use event::*;
 mod render;
 pub use render::*;
+mod thing;
+pub use thing::*;
+mod tile;
+pub use tile::*;
 
 use ggsdk::{
     GGAtlas, GGRunOptions, egui::Key

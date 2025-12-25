@@ -47,7 +47,7 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
     });
 
     match spawn_event.variant {
-        crate::world::ThingVariant::Player => {
+        crate::ThingVariant::Player => {
             // set player entity id
             ctx.world_mut().player = id;
         }
@@ -59,7 +59,7 @@ pub fn restart_system(_: &RestartEvent, ctx: &mut dyn Ctx) {
     ctx.world_mut().clear();
     ctx.push_event(Event::Spawn(crate::event::SpawnEvent {
         pos: glam::Vec3::default(),
-        variant: crate::world::ThingVariant::Player,
+        variant: crate::ThingVariant::Player,
     }));
 }
 
@@ -82,7 +82,7 @@ pub fn generate_map_system(_: &TickEvent, ctx: &mut dyn Ctx) {
                                 cell.y as f32 + 0.5,
                                 0.0,
                             ),
-                            variant: crate::world::ThingVariant::Tree,
+                            variant: crate::ThingVariant::Tree,
                         }));
                     }
                 }

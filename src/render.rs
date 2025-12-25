@@ -1,4 +1,4 @@
-use crate::{ThingVariant, World};
+use crate::{thing::ThingVariant, World};
 use ggsdk::{GGAtlas, GGPainter, egui::{Color32, LayerId, Pos2, Rect}};
 use glam::{IVec2, Vec2, Vec3, Vec4};
 use glow::HasContext;

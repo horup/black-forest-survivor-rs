@@ -1,7 +1,7 @@
 use glam::{Vec2, Vec3};
 use slotmap::DefaultKey;
 
-use crate::ThingVariant;
+use crate::thing::ThingVariant;
 
 #[derive(Clone)]
 pub enum Event {
