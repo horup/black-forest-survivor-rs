@@ -120,7 +120,8 @@ impl ggsdk::GGApp for App {
         let Some(player) = self.world.things.get(self.world.player) else {
             return;
         };
-        self.fps_camera.eye = player.pos + Vec3::new(0.0, 0.0, 0.5);
+        let player_pos = player.pos;
+        self.fps_camera.eye = player_pos + Vec3::new(0.0, 0.0, 0.5);
         let player_tile_pos = player.tile_pos();
         let camera: &dyn Camera = &self.fps_camera;
         let Some(texture) = g.assets.get::<GGAtlas>("grass") else {
@@ -135,21 +136,32 @@ impl ggsdk::GGApp for App {
             gl.clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
         }
 
+        let max_distance = 8;
+        let light = |d:f32| {
+            let d = d / max_distance as f32;
+            let d = 1.0 - d;
+            if d < 0.0 {
+                0.0
+            } else if d > 1.0{
+                1.0
+            } else {
+                d
+            }
+        };
+
         // draw tile
         let mut draw = self.glox.draw_builder(gl, camera);
-        let size = 8;
+       
         draw.bind_texture(Some(texture));
-        for y in -size..size {
-            for x in -size..size {
+        for y in -max_distance..max_distance {
+            for x in -max_distance..max_distance {
                 let tile_index = player_tile_pos + IVec2::new(x, y);
                 if let Some(_) = self.world.tiles.get(tile_index) {
                     let cell = player_tile_pos + Vec2::new(x as f32, y as f32).as_ivec2();
                     let p = Vec3::new(cell.x as f32 + 0.5, cell.y as f32 + 0.5, 0.0);
-
-                    let d = p - player.pos;
+                    let d = p - player_pos;
                     let d = d.length();
-                    let d = d / size as f32;
-                    let d = 1.0 - d;
+                    let d = light(d);
                     let color = Vec4::new(d, d, d, 1.0);
                     draw.push_vertices(&glox::floor_vertices(p, color));
                 }
@@ -179,9 +191,13 @@ impl ggsdk::GGApp for App {
                 draw.bind_texture(texture.into());
             }
             let p = thing.pos;
+            let d = p - player_pos;
+            let d = d.length();
+            let d = light(d);
+            let color = Vec4::new(d, d, d, 1.0);
             draw.push_vertices(&glox::billboard_vertices(
                 p,
-                Vec4::splat(1.0),
+                color,
                 camera_dir,
                 scaling_factor,
             ));
