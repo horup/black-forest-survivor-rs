@@ -51,7 +51,7 @@ pub fn render_3d_world(
         return;
     };
     let player_pos = player.pos;
-    let player_tile_pos = player.tile_pos();
+    let player_tile_pos = player.tile_index();
     let camera: &dyn Camera = fps_camera;
     let Some(texture) = g.assets.get::<GGAtlas>("grass") else {
         return;

@@ -21,17 +21,41 @@ pub fn input_system(e: &PlayerInputEvent, ctx: &mut dyn Ctx) {
 }
 
 /// handles movement of things in the world
+/// also handled collision resolution
 pub fn movement_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
     let dt = tick_event.dt;
-
     let max_speed = 5.0;
-    for (_id, thing) in ctx.world_mut().things.iter_mut() {
+    let world = ctx.world_mut();
+    for (entity_id, thing) in world.things.iter_mut() {
+        let vel = thing.move_dir * dt * max_speed;
+
+        if vel.length() == 0.0 {
+            continue;
+        }
+
+        // first remove thing from current tile
+        let tile_index = thing.tile_index();
+        if let Some(tile) = world.tiles.get_mut(tile_index) {
+            tile.entities.remove(&entity_id);
+        }
+
+        // move the thing
         thing.pos += thing.move_dir * dt * max_speed;
+
+        // check and resolve collision with solid things
+
+        // store thing in new tile
+        let new_tile_index = thing.tile_index();
+        if let Some(tile) = world.tiles.get_mut(new_tile_index) {
+            tile.entities.insert(entity_id, ());
+        }
     }
-    ctx.push_event(Event::Collision(CollisionEvent {
+    /*ctx.push_event(Event::Collision(CollisionEvent {
         entity_1_id: 1,
         entity_2_id: 2,
-    }));
+    }));*/
+
+    
 }
 
 pub fn collision_system(_collision_event: &CollisionEvent, _ctx: &mut dyn Ctx) {
@@ -72,7 +96,7 @@ pub fn generate_map_system(_: &TickEvent, ctx: &mut dyn Ctx) {
             for x in -s..=s {
                 let cell = grid_pos + glam::IVec2::new(x, y);
                 if ctx.world_mut().tiles.get(cell).is_none() {
-                    ctx.world_mut().tiles.insert(cell, Tile { solid: false });
+                    ctx.world_mut().tiles.insert(cell, Tile { solid: false, entities: Default::default() });
                     let r = ctx.rand_unsigned(6);
                     if r == 0 {
                         // spawn a tree

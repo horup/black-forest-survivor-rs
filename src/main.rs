@@ -1,5 +1,5 @@
-mod update;
-pub use update::*;
+mod systems;
+pub use systems::*;
 mod world;
 pub use world::*;
 mod event;
@@ -99,7 +99,7 @@ impl ggsdk::GGApp for App {
             facing,
         }));
         self.world.events.push_back(Event::Tick(TickEvent { dt: g.dt }));
-        update::process(self);
+        systems::process(self);
     }
 
     fn paint_glow(&mut self, g: ggsdk::PaintGlowContext) {

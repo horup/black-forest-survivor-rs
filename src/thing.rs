@@ -30,7 +30,7 @@ pub struct Thing {
 }
 
 impl Thing {
-    pub fn tile_pos(&self) -> glam::IVec2 {
+    pub fn tile_index(&self) -> glam::IVec2 {
         glam::IVec2::new(self.pos.x as i32, self.pos.y as i32)
     }
 }
