@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{CollisionEvent, PlayerInputEvent, RestartEvent, Thing, TickEvent, Tile, World, event::Event};
 
 pub trait Ctx {
@@ -26,40 +28,109 @@ pub fn movement_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
     let dt = tick_event.dt;
     let max_speed = 5.0;
     let world = ctx.world_mut();
-    for (entity_id, thing) in world.things.iter_mut() {
-        let vel = thing.move_dir * dt * max_speed;
+    let mut entities = Vec::new();
+    world.entities(&mut entities);
+    let mut close_entities = Vec::new();
+    let mut colliding_entities = HashMap::new();
+    for entity_id in entities {
+        close_entities.clear();
+        colliding_entities.clear();
+        let Some(thing) = world.entity(entity_id) else {
+            continue;
+        };
+        let thing_vel = thing.move_dir * dt * max_speed;
+        let thing_pos = thing.pos;
+        let thing_solid = thing.solid;
+        let thing_radius = thing.radius;
+        let thing_tile_index = thing.tile_index();
 
-        if vel.length() == 0.0 {
+        if thing_vel.length() == 0.0 {
             continue;
         }
 
         // first remove thing from current tile
-        let tile_index = thing.tile_index();
-        if let Some(tile) = world.tiles.get_mut(tile_index) {
+        if let Some(tile) = world.tiles.get_mut(thing_tile_index) {
             tile.entities.remove(&entity_id);
         }
 
-        // move the thing
-        thing.pos += thing.move_dir * dt * max_speed;
+        // now move the thing
+        let mut thing_pos = thing_pos + thing_vel;
 
         // check and resolve collision with solid things
+        if thing_solid {
+            world.get_entities(thing_pos.truncate().as_ivec2(), 2.0, &mut close_entities);
+        }
 
-        // store thing in new tile
-        let new_tile_index = thing.tile_index();
+        for other_entity_id in &close_entities {
+            if *other_entity_id == entity_id {
+                continue;
+            }
+            let Some(other_thing) = world.entity(*other_entity_id) else {
+                continue;
+            };
+            if !other_thing.solid {
+                continue;
+            }
+
+            let to_other = other_thing.pos - thing_pos;
+            let dist = to_other.length();
+            let min_dist = thing_radius + other_thing.radius;
+            if dist < min_dist && dist > 0.0 {
+                let overlap = min_dist - dist;
+                let correction = to_other.normalize() * overlap;
+                thing_pos += -correction * 0.5;
+                colliding_entities.insert(*other_entity_id, ());
+            }
+        }
+
+        // finally update thing position
+        if let Some(thing_mut) = world.things.get_mut(entity_id) {
+            thing_mut.pos = thing_pos;
+        }
+
+        // add thing to new tile
+        let new_tile_index = thing_pos.truncate().as_ivec2();
         if let Some(tile) = world.tiles.get_mut(new_tile_index) {
             tile.entities.insert(entity_id, ());
         }
-    }
-    /*ctx.push_event(Event::Collision(CollisionEvent {
-        entity_1_id: 1,
-        entity_2_id: 2,
-    }));*/
 
-    
+        for other_entity_id in colliding_entities.keys() {
+            world.events.push_back(Event::Collision(CollisionEvent {
+                entity_1_id: entity_id.clone(),
+                entity_2_id: other_entity_id.clone(),
+            }));
+        }
+    }
 }
 
 pub fn collision_system(_collision_event: &CollisionEvent, _ctx: &mut dyn Ctx) {
    
+}
+
+
+pub fn map_entities_to_tiles_system(_: &TickEvent, ctx: &mut dyn Ctx) {
+    let world = ctx.world_mut();
+
+    // clear all tile entity mappings
+    for chunk in &mut world.tiles {
+        for (_, tile) in chunk {
+            tile.entities.clear();
+        }
+    }
+
+    // map entities to tiles
+    let mut entities = Vec::new();
+    world.entities(&mut entities);
+    for entity_id in entities {
+        let Some(thing) = world.entity(entity_id) else {
+            continue;
+        };
+        let tile_index = thing.tile_index();
+
+        if let Some(tile) = world.tiles.get_mut(tile_index) {
+            tile.entities.insert(entity_id, ());
+        }
+    }
 }
 
 pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
@@ -68,7 +139,8 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
         variant: spawn_event.variant,
         move_dir: Default::default(),
         facing: 0.0,
-        solid: true
+        solid: true,
+        radius: 0.4,
     });
 
     match spawn_event.variant {
@@ -121,6 +193,7 @@ pub fn process(ctx: &mut dyn Ctx) {
         match event {
             Event::Tick(tick_event) => {
                 generate_map_system(&tick_event, ctx);
+                map_entities_to_tiles_system(&tick_event, ctx);
                 movement_system(&tick_event, ctx);
             }
             Event::Collision(collision_event) => {

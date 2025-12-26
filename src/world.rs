@@ -13,12 +13,27 @@ pub struct World {
     pub tiles: endlessgrid::Grid<Tile>,
     /// The players entity id
     pub player: slotmap::DefaultKey,
-
     /// Unprocessed events
     pub events:VecDeque<Event>
 }
 
 impl World {
+
+    /// Get all entity IDs in the world
+    pub fn entities(&self, entities:&mut Vec<DefaultKey>) {
+        for (entity_id, _) in self.things.iter() {
+            entities.push(entity_id);
+        }
+    }
+
+    pub fn entity_mut(&mut self, entity_id:DefaultKey) -> Option<&mut Thing> {
+        self.things.get_mut(entity_id)
+    }
+
+    pub fn entity(&self, entity_id:DefaultKey) -> Option<&Thing> {
+        self.things.get(entity_id)
+    }
+
     /// Clear the world of all things and tiles
     pub fn clear(&mut self) {
         self.things.clear();

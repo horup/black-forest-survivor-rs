@@ -31,8 +31,8 @@ pub struct TickEvent {
 
 #[derive(Clone)]
 pub struct CollisionEvent {
-    pub entity_1_id: u32,
-    pub entity_2_id: u32,
+    pub entity_1_id: DefaultKey,
+    pub entity_2_id: DefaultKey,
 }
 
 #[derive(Clone)]

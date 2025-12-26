@@ -30,6 +30,9 @@ pub struct Thing {
 
     /// Whether this thing is solid (i.e., impassable)
     pub solid: bool,
+
+    /// Interaction radius, for collision detection
+    pub radius:f32
 }
 
 impl Thing {
