@@ -68,6 +68,7 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
         variant: spawn_event.variant,
         move_dir: Default::default(),
         facing: 0.0,
+        solid: true
     });
 
     match spawn_event.variant {

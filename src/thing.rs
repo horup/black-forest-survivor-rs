@@ -27,6 +27,9 @@ pub struct Thing {
 
     /// Facing direction in radians
     pub facing: f32,
+
+    /// Whether this thing is solid (i.e., impassable)
+    pub solid: bool,
 }
 
 impl Thing {
