@@ -14,6 +14,16 @@ pub fn texture_for_thing_variant(
     }
 }
 
+pub fn scale_for_thing_variant(
+    variant: ThingVariant,
+) -> Vec2 {
+    match variant {
+        ThingVariant::Player => Vec2::splat(1.0),
+        ThingVariant::Tree => Vec2::new(2.0, 4.0),
+        _ => Vec2::splat(1.0),
+    }
+}
+
 pub struct Render {
     
 }
@@ -105,10 +115,7 @@ pub fn render_3d_world(
             ThingVariant::Player => "grass",
             _ => "tree"
         };
-        let scaling_factor = match thing.variant {
-            ThingVariant::Unknown => Vec2::new(1.0, 2.0),
-            _ => Vec2::splat(1.0)
-        };
+        let scaling_factor = scale_for_thing_variant(thing.variant);
         if let Some(atlas) = g.assets.get::<GGAtlas>(texture) {
             let texture = g.painter.texture(atlas.texture_id()).unwrap();
             draw.bind_texture(texture.into());
