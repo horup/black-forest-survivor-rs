@@ -25,6 +25,9 @@ pub fn input_system(e: &PlayerInputEvent, ctx: &mut dyn Ctx) {
     if let Some(thing) = ctx.world_mut().entities.get_mut(e.player_id) {
         thing.move_dir = e.move_dir;
         thing.facing = e.facing;
+        if e.use_ability {
+            thing.active_ability();
+        }
     }
 }
 
@@ -215,17 +218,17 @@ pub fn ability_cooldown_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
     let mut entities = Vec::new();
     world.entities(&mut entities);
     for entity_id in entities {
-        if let Some(thing) = world.entities.get_mut(entity_id) {
-            if thing.ability_timer_sec > 0.0 {
-                let ability_timer_before_sec = thing.ability_timer_sec;
-                thing.ability_timer_sec -= dt;
-                if ability_timer_before_sec < thing.ability_activates_at_sec && thing.ability_timer_sec >= thing.ability_activates_at_sec {
+        if let Some(e) = world.entities.get_mut(entity_id) {
+            if e.ability_timer_sec > 0.0 {
+                let ability_timer_before_sec = e.ability_timer_sec;
+                e.ability_timer_sec -= dt;
+                if ability_timer_before_sec > e.ability_activates_at_sec && e.ability_timer_sec <= e.ability_activates_at_sec {
                     world.events.push_back(Event::AbilityActived(AbilityActivedEvent {
                         entity_id,
                     }));
                 }
-                if thing.ability_timer_sec < 0.0 {
-                    thing.ability_timer_sec = 0.0;
+                if e.ability_timer_sec < 0.0 {
+                    e.ability_timer_sec = 0.0;
                 }
             }
         }

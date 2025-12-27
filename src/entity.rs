@@ -51,4 +51,12 @@ impl Entity {
     pub fn tile_index(&self) -> glam::IVec2 {
         glam::IVec2::new(self.pos.x as i32, self.pos.y as i32)
     }
+
+    /// Activate the entity's ability, starting its cooldown timer
+    /// If the ability is already on cooldown, this has no effect
+    pub fn active_ability(&mut self) {
+        if self.ability_timer_sec <= 0.0 {
+            self.ability_timer_sec = self.ability_timer_total_sec;
+        }
+    }
 }
