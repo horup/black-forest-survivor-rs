@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{CollisionEvent, Entity, PlayerInputEvent, RestartEvent, EntityVariant, TickEvent, Tile, World, event::Event};
+use crate::{AbilityActivedEvent, CollisionEvent, Entity, EntityVariant, PlayerInputEvent, RestartEvent, TickEvent, Tile, World, event::Event};
 
 pub trait Ctx {
     fn world_mut(&mut self) -> &mut World;
@@ -205,6 +205,33 @@ pub fn generate_map_system(_: &TickEvent, ctx: &mut dyn Ctx) {
     }
 }
 
+pub fn ability_activated_system(_: &AbilityActivedEvent, _ctx: &mut dyn Ctx) {
+    dbg!("ability activated!");
+}
+
+pub fn ability_cooldown_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
+    let dt = tick_event.dt;
+    let world = ctx.world_mut();
+    let mut entities = Vec::new();
+    world.entities(&mut entities);
+    for entity_id in entities {
+        if let Some(thing) = world.entities.get_mut(entity_id) {
+            if thing.ability_timer_sec > 0.0 {
+                let ability_timer_before_sec = thing.ability_timer_sec;
+                thing.ability_timer_sec -= dt;
+                if ability_timer_before_sec < thing.ability_activates_at_sec && thing.ability_timer_sec >= thing.ability_activates_at_sec {
+                    world.events.push_back(Event::AbilityActived(AbilityActivedEvent {
+                        entity_id,
+                    }));
+                }
+                if thing.ability_timer_sec < 0.0 {
+                    thing.ability_timer_sec = 0.0;
+                }
+            }
+        }
+    }
+}
+
 pub fn process(ctx: &mut dyn Ctx) {
     while let Some(event) = ctx.world_mut().events.pop_front() {
         match event {
@@ -212,6 +239,7 @@ pub fn process(ctx: &mut dyn Ctx) {
                 generate_map_system(&tick_event, ctx);
                 map_entities_to_tiles_system(&tick_event, ctx);
                 movement_system(&tick_event, ctx);
+                ability_cooldown_system(&tick_event, ctx);
             }
             Event::Collision(collision_event) => {
                 collision_system(&collision_event, ctx);
@@ -224,6 +252,9 @@ pub fn process(ctx: &mut dyn Ctx) {
             }
             Event::PlayerInput(player_input_event) => {
                 input_system(&player_input_event, ctx);
+            },
+            Event::AbilityActived(ability_actived_event) => {
+                ability_activated_system(&ability_actived_event, ctx);
             },
         }
     }

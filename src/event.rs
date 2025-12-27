@@ -10,6 +10,7 @@ pub enum Event {
     Restart(RestartEvent),
     Spawn(SpawnEvent),
     PlayerInput(PlayerInputEvent),
+    AbilityActived(AbilityActivedEvent),
 }
 
 #[derive(Clone)]
@@ -22,6 +23,9 @@ pub struct PlayerInputEvent {
 
     /// facing direction in radians
     pub facing: f32,
+
+    /// whether the player used their ability this tick
+    pub use_ability: bool,
 }
 
 #[derive(Clone)]
@@ -44,4 +48,9 @@ pub struct RestartEvent {
 pub struct SpawnEvent {
     pub pos:Vec3,
     pub variant:EntityVariant,
+}
+
+#[derive(Clone)]
+pub struct AbilityActivedEvent {
+    pub entity_id: DefaultKey,
 }

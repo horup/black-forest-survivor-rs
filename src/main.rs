@@ -58,6 +58,7 @@ impl ggsdk::GGApp for App {
     fn update_glow(&mut self, g: ggsdk::UpdateContext) {
         let mut move_dir = Vec2::new(0.0, 0.0);
         let mut pointer_delta = Vec2::new(0.0, 0.0);
+        let mut use_ability = false;
         g.egui_ctx.input(|x| {
             let r = x.content_rect();
             self.fps_camera.viewport_size = Vec2::new(r.width(), r.height());
@@ -74,6 +75,9 @@ impl ggsdk::GGApp for App {
             if x.key_down(Key::D) {
                 move_dir.x = 1.0;
             }
+            if x.key_down(Key::Space) {
+                use_ability = true;
+            }
 
             let delta = x.pointer.motion().unwrap_or_default();
             pointer_delta = Vec2::new(delta.x, delta.y);
@@ -85,7 +89,12 @@ impl ggsdk::GGApp for App {
             if x.key_down(Key::E) {
                 pointer_delta.x += spd;
             }
+
+            if x.pointer.primary_down() {
+                use_ability = true;
+            }
         });
+
 
         let current_camera_pos = self.fps_camera.eye;
         self.fps_camera.move_self_horizontal(move_dir.extend(0.0));
@@ -97,6 +106,7 @@ impl ggsdk::GGApp for App {
             player_id: self.world.player,
             move_dir: move_dir.normalize_or_zero(),
             facing,
+            use_ability, 
         }));
         self.world.events.push_back(Event::Tick(TickEvent { dt: g.dt }));
         systems::process(self);
