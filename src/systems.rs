@@ -11,6 +11,12 @@ pub trait Ctx {
     fn rand_unsigned(&mut self, max: u32) -> u32 {
         self.rand_u32() % max
     }
+    fn rand_f32(&mut self) -> f32 {
+        self.rand_u32() as f32 / u32::MAX as f32
+    }
+    fn rand_f32_range(&mut self, min: f32, max: f32) -> f32 {
+        min + (max - min) * self.rand_f32()
+    }
 }
 
 
@@ -150,7 +156,11 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
             ctx.world_mut().player = id;
         },
         EntityVariant::Tree => {
-            ctx.world_mut().entity_mut(id).unwrap().sprite_size = glam::Vec2::new(1.0, 2.0);
+            let w = ctx.rand_f32_range(1.0, 1.3);
+            let h = ctx.rand_f32_range(1.5, 2.5);
+            let e = ctx.world_mut().entity_mut(id).unwrap();
+            e.radius = 0.1;
+            e.sprite_size = glam::Vec2::new(w, h);
         },
         _ => {}
     }
