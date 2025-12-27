@@ -15,20 +15,20 @@ impl Default for EntityVariant {
 
 #[derive(Default, Clone, Copy)]
 pub struct Entity {
-    /// Position of this thing
+    /// Position of this entity
     pub pos: glam::Vec3,
 
-    /// Variant of this thing, such as a player, monster, item, etc. 
+    /// Variant of this entity, such as a player, monster, item, etc. 
     pub variant: EntityVariant,
 
-    /// Movement direction of this thing
+    /// Movement direction of this entity
     /// Normalized from 0..1
     pub move_dir: Vec3,
 
     /// Facing direction in radians
     pub facing: f32,
 
-    /// Whether this thing is solid (i.e., impassable)
+    /// Whether this entity is solid (i.e., impassable)
     pub solid: bool,
 
     /// Interaction radius, for collision detection

@@ -20,18 +20,18 @@ pub trait Ctx {
 }
 
 
-/// handles inputs for things in the world
+/// handles inputs for entities in the world
 pub fn input_system(e: &PlayerInputEvent, ctx: &mut dyn Ctx) {
-    if let Some(thing) = ctx.world_mut().entities.get_mut(e.player_id) {
-        thing.move_dir = e.move_dir;
-        thing.facing = e.facing;
+    if let Some(entity) = ctx.world_mut().entities.get_mut(e.player_id) {
+        entity.move_dir = e.move_dir;
+        entity.facing = e.facing;
         if e.use_ability {
-            thing.active_ability();
+            entity.active_ability();
         }
     }
 }
 
-/// handles movement of things in the world
+/// handles movement of entities in the world
 /// also handled collision resolution
 pub fn movement_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
     let dt = tick_event.dt;
@@ -44,61 +44,61 @@ pub fn movement_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
     for entity_id in entities {
         close_entities.clear();
         colliding_entities.clear();
-        let Some(thing) = world.entity(entity_id) else {
+        let Some(entity) = world.entity(entity_id) else {
             continue;
         };
-        let thing_vel = thing.move_dir * dt * max_speed;
-        let thing_pos = thing.pos;
-        let thing_solid = thing.solid;
-        let thing_radius = thing.radius;
-        let thing_tile_index = thing.tile_index();
+        let entity_vel = entity.move_dir * dt * max_speed;
+        let entity_pos = entity.pos;
+        let entity_solid = entity.solid;
+        let entity_radius = entity.radius;
+        let entity_tile_index = entity.tile_index();
 
-        if thing_vel.length() == 0.0 {
+        if entity_vel.length() == 0.0 {
             continue;
         }
 
-        // first remove thing from current tile
-        if let Some(tile) = world.tiles.get_mut(thing_tile_index) {
+        // first remove entity from current tile
+        if let Some(tile) = world.tiles.get_mut(entity_tile_index) {
             tile.entities.remove(&entity_id);
         }
 
-        // now move the thing
-        let mut thing_pos = thing_pos + thing_vel;
+        // now move the entity
+        let mut entity_pos = entity_pos + entity_vel;
 
-        // check and resolve collision with solid things
-        if thing_solid {
-            world.get_entities(thing_pos.truncate().as_ivec2(), 2.0, &mut close_entities);
+        // check and resolve collision with solid entities
+        if entity_solid {
+            world.get_entities(entity_pos.truncate().as_ivec2(), 2.0, &mut close_entities);
         }
 
         for other_entity_id in &close_entities {
             if *other_entity_id == entity_id {
                 continue;
             }
-            let Some(other_thing) = world.entity(*other_entity_id) else {
+            let Some(other_entity) = world.entity(*other_entity_id) else {
                 continue;
             };
-            if !other_thing.solid {
+            if !other_entity.solid {
                 continue;
             }
 
-            let to_other = other_thing.pos - thing_pos;
+            let to_other = other_entity.pos - entity_pos;
             let dist = to_other.length();
-            let min_dist = thing_radius + other_thing.radius;
+            let min_dist = entity_radius + other_entity.radius;
             if dist < min_dist && dist > 0.0 {
                 let overlap = min_dist - dist;
                 let correction = to_other.normalize() * overlap;
-                thing_pos += -correction * 0.5;
+                entity_pos += -correction * 0.5;
                 colliding_entities.insert(*other_entity_id, ());
             }
         }
 
-        // finally update thing position
-        if let Some(thing_mut) = world.entities.get_mut(entity_id) {
-            thing_mut.pos = thing_pos;
+        // finally update entity position
+        if let Some(entity_mut) = world.entities.get_mut(entity_id) {
+            entity_mut.pos = entity_pos;
         }
 
-        // add thing to new tile
-        let new_tile_index = thing_pos.truncate().as_ivec2();
+        // add entity to new tile
+        let new_tile_index = entity_pos.truncate().as_ivec2();
         if let Some(tile) = world.tiles.get_mut(new_tile_index) {
             tile.entities.insert(entity_id, ());
         }
@@ -131,10 +131,10 @@ pub fn map_entities_to_tiles_system(_: &TickEvent, ctx: &mut dyn Ctx) {
     let mut entities = Vec::new();
     world.entities(&mut entities);
     for entity_id in entities {
-        let Some(thing) = world.entity(entity_id) else {
+        let Some(entity) = world.entity(entity_id) else {
             continue;
         };
-        let tile_index = thing.tile_index();
+        let tile_index = entity.tile_index();
 
         if let Some(tile) = world.tiles.get_mut(tile_index) {
             tile.entities.insert(entity_id, ());

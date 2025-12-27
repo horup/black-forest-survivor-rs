@@ -7,7 +7,7 @@ use crate::{Event, entity::Entity, tile::Tile};
 
 #[derive(Default, Clone)]
 pub struct World {
-    /// All things in the game world
+    /// All entities in the game world
     pub entities: slotmap::SlotMap<slotmap::DefaultKey, Entity>,
     /// The tiles making up the game world
     pub tiles: endlessgrid::Grid<Tile>,
@@ -34,18 +34,18 @@ impl World {
         self.entities.get(entity_id)
     }
 
-    /// Clear the world of all things and tiles
+    /// Clear the world of all entities and tiles
     pub fn clear(&mut self) {
         self.entities.clear();
         self.tiles = Default::default();
     }
 
-    /// Get a mutable reference to the player thing
+    /// Get a mutable reference to the player entity
     pub fn player_mut(&mut self) -> Option<&mut Entity> {
         self.entities.get_mut(self.player)
     }
 
-    /// Get a reference to the player thing
+    /// Get a reference to the player entity
     pub fn player(&self) -> Option<&Entity> {
         self.entities.get(self.player)
     }

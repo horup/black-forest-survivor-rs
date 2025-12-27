@@ -4,7 +4,7 @@ use glam::{IVec2, Vec2, Vec3, Vec4};
 use glow::HasContext;
 use glox::{Camera, FirstPersonCamera};
 
-pub fn texture_for_thing_variant(
+pub fn texture_for_entity_variant(
     variant: EntityVariant,
 ) -> &'static str {
     match variant {
@@ -99,18 +99,18 @@ pub fn render_3d_world(
     draw.finish();
 
     // draw some sprites / billboards
-    for thing in world.entities.values() {
+    for entity in world.entities.values() {
         let mut draw = glox.draw_builder(gl, camera);
-        let texture = match thing.variant {
+        let texture = match entity.variant {
             EntityVariant::Player => "grass",
             _ => "tree"
         };
-        let scaling_factor = thing.sprite_size;
+        let scaling_factor = entity.sprite_size;
         if let Some(atlas) = g.assets.get::<GGAtlas>(texture) {
             let texture = g.painter.texture(atlas.texture_id()).unwrap();
             draw.bind_texture(texture.into());
         }
-        let p = thing.pos;
+        let p = entity.pos;
         let d = p - player_pos;
         let d = d.length();
         let d = light(d);
