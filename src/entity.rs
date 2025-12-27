@@ -14,7 +14,7 @@ impl Default for ThingVariant {
 }
 
 #[derive(Default, Clone, Copy)]
-pub struct Thing {
+pub struct Entity {
     /// Position of this thing
     pub pos: glam::Vec3,
 
@@ -35,7 +35,7 @@ pub struct Thing {
     pub radius:f32
 }
 
-impl Thing {
+impl Entity {
     pub fn tile_index(&self) -> glam::IVec2 {
         glam::IVec2::new(self.pos.x as i32, self.pos.y as i32)
     }

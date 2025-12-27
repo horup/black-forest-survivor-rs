@@ -1,4 +1,4 @@
-use crate::{thing::ThingVariant, World};
+use crate::{entity::ThingVariant, World};
 use ggsdk::{GGAtlas, GGPainter, egui::{Color32, LayerId, Pos2, Rect}};
 use glam::{IVec2, Vec2, Vec3, Vec4};
 use glow::HasContext;
@@ -57,7 +57,7 @@ pub fn render_3d_world(
     glox: &mut glox::Glox,
     g: &ggsdk::PaintGlowContext,
 ) {
-    let Some(player) = world.things.get(world.player) else {
+    let Some(player) = world.entities.get(world.player) else {
         return;
     };
     let player_pos = player.pos;
@@ -109,7 +109,7 @@ pub fn render_3d_world(
     draw.finish();
 
     // draw some sprites / billboards
-    for thing in world.things.values() {
+    for thing in world.entities.values() {
         let mut draw = glox.draw_builder(gl, camera);
         let texture = match thing.variant {
             ThingVariant::Player => "grass",

@@ -3,12 +3,12 @@ use std::collections::VecDeque;
 use glam::IVec2;
 use slotmap::DefaultKey;
 
-use crate::{Event, thing::Thing, tile::{self, Tile}};
+use crate::{Event, entity::Entity, tile::{self, Tile}};
 
 #[derive(Default, Clone)]
 pub struct World {
     /// All things in the game world
-    pub things: slotmap::SlotMap<slotmap::DefaultKey, Thing>,
+    pub entities: slotmap::SlotMap<slotmap::DefaultKey, Entity>,
     /// The tiles making up the game world
     pub tiles: endlessgrid::Grid<Tile>,
     /// The players entity id
@@ -21,33 +21,33 @@ impl World {
 
     /// Get all entity IDs in the world
     pub fn entities(&self, entities:&mut Vec<DefaultKey>) {
-        for (entity_id, _) in self.things.iter() {
+        for (entity_id, _) in self.entities.iter() {
             entities.push(entity_id);
         }
     }
 
-    pub fn entity_mut(&mut self, entity_id:DefaultKey) -> Option<&mut Thing> {
-        self.things.get_mut(entity_id)
+    pub fn entity_mut(&mut self, entity_id:DefaultKey) -> Option<&mut Entity> {
+        self.entities.get_mut(entity_id)
     }
 
-    pub fn entity(&self, entity_id:DefaultKey) -> Option<&Thing> {
-        self.things.get(entity_id)
+    pub fn entity(&self, entity_id:DefaultKey) -> Option<&Entity> {
+        self.entities.get(entity_id)
     }
 
     /// Clear the world of all things and tiles
     pub fn clear(&mut self) {
-        self.things.clear();
+        self.entities.clear();
         self.tiles = Default::default();
     }
 
     /// Get a mutable reference to the player thing
-    pub fn player_mut(&mut self) -> Option<&mut Thing> {
-        self.things.get_mut(self.player)
+    pub fn player_mut(&mut self) -> Option<&mut Entity> {
+        self.entities.get_mut(self.player)
     }
 
     /// Get a reference to the player thing
-    pub fn player(&self) -> Option<&Thing> {
-        self.things.get(self.player)
+    pub fn player(&self) -> Option<&Entity> {
+        self.entities.get(self.player)
     }
 
     /// Get all entities within a certain radius of a tile position

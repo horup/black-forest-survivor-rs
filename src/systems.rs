@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{CollisionEvent, PlayerInputEvent, RestartEvent, Thing, TickEvent, Tile, World, event::Event};
+use crate::{CollisionEvent, PlayerInputEvent, RestartEvent, Entity, TickEvent, Tile, World, event::Event};
 
 pub trait Ctx {
     fn world_mut(&mut self) -> &mut World;
@@ -16,7 +16,7 @@ pub trait Ctx {
 
 /// handles inputs for things in the world
 pub fn input_system(e: &PlayerInputEvent, ctx: &mut dyn Ctx) {
-    if let Some(thing) = ctx.world_mut().things.get_mut(e.player_id) {
+    if let Some(thing) = ctx.world_mut().entities.get_mut(e.player_id) {
         thing.move_dir = e.move_dir;
         thing.facing = e.facing;
     }
@@ -84,7 +84,7 @@ pub fn movement_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
         }
 
         // finally update thing position
-        if let Some(thing_mut) = world.things.get_mut(entity_id) {
+        if let Some(thing_mut) = world.entities.get_mut(entity_id) {
             thing_mut.pos = thing_pos;
         }
 
@@ -134,7 +134,7 @@ pub fn map_entities_to_tiles_system(_: &TickEvent, ctx: &mut dyn Ctx) {
 }
 
 pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
-    let id = ctx.world_mut().things.insert(Thing {
+    let id = ctx.world_mut().entities.insert(Entity {
         pos: spawn_event.pos,
         variant: spawn_event.variant,
         move_dir: Default::default(),
@@ -162,7 +162,7 @@ pub fn restart_system(_: &RestartEvent, ctx: &mut dyn Ctx) {
 
 pub fn generate_map_system(_: &TickEvent, ctx: &mut dyn Ctx) {
     let player_id = ctx.world_mut().player;
-    if let Some(player) = ctx.world_mut().things.get_mut(player_id) {
+    if let Some(player) = ctx.world_mut().entities.get_mut(player_id) {
         let grid_pos = player.pos.truncate().as_ivec2();
         let s = 16;
         for y in -s..=s {

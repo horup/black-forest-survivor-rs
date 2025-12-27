@@ -6,8 +6,8 @@ mod event;
 pub use event::*;
 mod render;
 pub use render::*;
-mod thing;
-pub use thing::*;
+mod entity;
+pub use entity::*;
 mod tile;
 pub use tile::*;
 
@@ -103,7 +103,7 @@ impl ggsdk::GGApp for App {
     }
 
     fn paint_glow(&mut self, g: ggsdk::PaintGlowContext) {
-        let Some(player) = self.world.things.get(self.world.player) else {
+        let Some(player) = self.world.entities.get(self.world.player) else {
             return;
         };
         let player_pos = player.pos;
