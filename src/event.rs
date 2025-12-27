@@ -1,4 +1,4 @@
-use glam::{Vec2, Vec3};
+use glam::Vec3;
 use slotmap::DefaultKey;
 
 use crate::entity::EntityVariant;
