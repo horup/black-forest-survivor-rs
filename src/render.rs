@@ -1,26 +1,16 @@
-use crate::{entity::ThingVariant, World};
+use crate::{entity::EntityVariant, World};
 use ggsdk::{GGAtlas, GGPainter, egui::{Color32, LayerId, Pos2, Rect}};
 use glam::{IVec2, Vec2, Vec3, Vec4};
 use glow::HasContext;
 use glox::{Camera, FirstPersonCamera};
 
 pub fn texture_for_thing_variant(
-    variant: ThingVariant,
+    variant: EntityVariant,
 ) -> &'static str {
     match variant {
-        ThingVariant::Player => "player",
-        ThingVariant::Tree => "tree",
+        EntityVariant::Player => "player",
+        EntityVariant::Tree => "tree",
         _ => "unknown",
-    }
-}
-
-pub fn scale_for_thing_variant(
-    variant: ThingVariant,
-) -> Vec2 {
-    match variant {
-        ThingVariant::Player => Vec2::splat(1.0),
-        ThingVariant::Tree => Vec2::new(2.0, 4.0),
-        _ => Vec2::splat(1.0),
     }
 }
 
@@ -112,10 +102,10 @@ pub fn render_3d_world(
     for thing in world.entities.values() {
         let mut draw = glox.draw_builder(gl, camera);
         let texture = match thing.variant {
-            ThingVariant::Player => "grass",
+            EntityVariant::Player => "grass",
             _ => "tree"
         };
-        let scaling_factor = scale_for_thing_variant(thing.variant);
+        let scaling_factor = thing.sprite_size;
         if let Some(atlas) = g.assets.get::<GGAtlas>(texture) {
             let texture = g.painter.texture(atlas.texture_id()).unwrap();
             draw.bind_texture(texture.into());

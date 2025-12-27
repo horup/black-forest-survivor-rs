@@ -1,15 +1,15 @@
-use glam::Vec3;
+use glam::{Vec2, Vec3};
 
 #[derive(Clone, Copy)]
-pub enum ThingVariant {
+pub enum EntityVariant {
     Unknown,
     Player,
     Tree
 }
 
-impl Default for ThingVariant {
+impl Default for EntityVariant {
     fn default() -> Self {
-        ThingVariant::Unknown
+        EntityVariant::Unknown
     }
 }
 
@@ -19,7 +19,7 @@ pub struct Entity {
     pub pos: glam::Vec3,
 
     /// Variant of this thing, such as a player, monster, item, etc. 
-    pub variant: ThingVariant,
+    pub variant: EntityVariant,
 
     /// Movement direction of this thing
     /// Normalized from 0..1
@@ -32,7 +32,10 @@ pub struct Entity {
     pub solid: bool,
 
     /// Interaction radius, for collision detection
-    pub radius:f32
+    pub radius:f32,
+
+    /// Size of the sprite representing this entity
+    pub sprite_size:Vec2,
 }
 
 impl Entity {

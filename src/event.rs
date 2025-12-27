@@ -1,7 +1,7 @@
 use glam::{Vec2, Vec3};
 use slotmap::DefaultKey;
 
-use crate::entity::ThingVariant;
+use crate::entity::EntityVariant;
 
 #[derive(Clone)]
 pub enum Event {
@@ -43,5 +43,5 @@ pub struct RestartEvent {
 #[derive(Clone)]
 pub struct SpawnEvent {
     pub pos:Vec3,
-    pub variant:ThingVariant,
+    pub variant:EntityVariant,
 }

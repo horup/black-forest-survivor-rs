@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use glam::IVec2;
 use slotmap::DefaultKey;
 
-use crate::{Event, entity::Entity, tile::{self, Tile}};
+use crate::{Event, entity::Entity, tile::Tile};
 
 #[derive(Default, Clone)]
 pub struct World {

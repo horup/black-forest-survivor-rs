@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{CollisionEvent, PlayerInputEvent, RestartEvent, Entity, TickEvent, Tile, World, event::Event};
+use crate::{CollisionEvent, Entity, PlayerInputEvent, RestartEvent, EntityVariant, TickEvent, Tile, World, event::Event};
 
 pub trait Ctx {
     fn world_mut(&mut self) -> &mut World;
@@ -141,13 +141,17 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
         facing: 0.0,
         solid: true,
         radius: 0.4,
+        sprite_size: glam::Vec2::new(1.0, 1.0),
     });
 
     match spawn_event.variant {
-        crate::ThingVariant::Player => {
+        EntityVariant::Player => {
             // set player entity id
             ctx.world_mut().player = id;
-        }
+        },
+        EntityVariant::Tree => {
+            ctx.world_mut().entity_mut(id).unwrap().sprite_size = glam::Vec2::new(1.0, 2.0);
+        },
         _ => {}
     }
 }
@@ -156,7 +160,7 @@ pub fn restart_system(_: &RestartEvent, ctx: &mut dyn Ctx) {
     ctx.world_mut().clear();
     ctx.push_event(Event::Spawn(crate::event::SpawnEvent {
         pos: glam::Vec3::default(),
-        variant: crate::ThingVariant::Player,
+        variant: crate::EntityVariant::Player,
     }));
 }
 
@@ -179,7 +183,7 @@ pub fn generate_map_system(_: &TickEvent, ctx: &mut dyn Ctx) {
                                 cell.y as f32 + 0.5,
                                 0.0,
                             ),
-                            variant: crate::ThingVariant::Tree,
+                            variant: crate::EntityVariant::Tree,
                         }));
                     }
                 }
