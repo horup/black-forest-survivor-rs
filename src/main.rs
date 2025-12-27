@@ -52,7 +52,7 @@ impl ggsdk::GGApp for App {
     }
 
     fn update(&mut self, g: ggsdk::UpdateContext) {
-        render::render_ui(&g);
+        render::render_ui(&self.world, &g);
     }
 
     fn update_glow(&mut self, g: ggsdk::UpdateContext) {

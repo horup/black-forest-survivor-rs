@@ -23,7 +23,7 @@ impl Render {
 }
 
 /// Renders the 2D UI elements (torch and axe)
-pub fn render_ui(g: &ggsdk::UpdateContext) {
+pub fn render_ui(world:&World, g: &ggsdk::UpdateContext) {
     let painter = g.egui_ctx.layer_painter(LayerId::background());
 
     let Some(torch) = g.assets.get::<GGAtlas>("torch") else { return; };
@@ -35,9 +35,20 @@ pub fn render_ui(g: &ggsdk::UpdateContext) {
     painter.atlas(&torch, 0, Rect::from_min_max(Pos2::new(0.0, 0.0), Pos2::new(w, screen_size.y)), Color32::WHITE);
 
     let Some(axe) = g.assets.get::<GGAtlas>("axe") else { return; };
-    let h = screen_size.y;
-    let w = h / 2.0;
-    painter.atlas(&axe, 0, Rect::from_min_max(Pos2::new(screen_size.x - w, 0.0), Pos2::new(screen_size.x, screen_size.y)), Color32::WHITE);
+
+    let Some(player) = world.entities.get(world.player) else { return; };
+    let cooldown = player.ability_delta();
+    dbg!(cooldown);
+    if cooldown == 1.0 {
+        // not on cooldown, draw normally
+        let y = h / 4.0;
+        painter.atlas(&axe, 0, Rect::from_min_max(Pos2::new(screen_size.x - w, y), Pos2::new(screen_size.x, screen_size.y + y)), Color32::WHITE);
+    } else {
+        let y = cooldown * 2.0 * h;
+        let x = -cooldown * 3.0 *w;
+        painter.atlas(&axe, 0, Rect::from_min_max(Pos2::new(screen_size.x - w + x, y), Pos2::new(screen_size.x + x, screen_size.y + y)), Color32::WHITE);
+    }
+   
 }
 
 /// Renders the 3D world using OpenGL

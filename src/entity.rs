@@ -59,4 +59,13 @@ impl Entity {
             self.ability_timer_sec = self.ability_timer_total_sec;
         }
     }
+
+    /// Returns a value between 0.0 and 1.0 representing the progress of the ability cooldown
+    pub fn ability_delta(&self) -> f32 {
+        if self.ability_timer_total_sec <= 0.0 {
+            0.0
+        } else {
+            1.0 - (self.ability_timer_sec / self.ability_timer_total_sec)
+        }
+    }
 }
