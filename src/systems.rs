@@ -148,6 +148,9 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
         solid: true,
         radius: 0.4,
         sprite_size: glam::Vec2::new(1.0, 1.0),
+        ability_activates_at_sec: 0.5,
+        ability_timer_sec: 0.0,
+        ability_timer_total_sec: 1.0
     });
 
     match spawn_event.variant {

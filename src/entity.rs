@@ -36,6 +36,15 @@ pub struct Entity {
 
     /// Size of the sprite representing this entity
     pub sprite_size:Vec2,
+
+    /// Ability cooldown timer in seconds
+    pub ability_timer_sec:f32,
+
+    /// Total duration of the ability cooldown in seconds
+    pub ability_timer_total_sec:f32,
+
+    /// Time when the ability actives
+    pub ability_activates_at_sec:f32,
 }
 
 impl Entity {
