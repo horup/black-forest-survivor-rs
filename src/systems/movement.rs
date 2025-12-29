@@ -25,6 +25,16 @@ pub fn movement_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
         let entity_tile_index = entity.tile_index();
 
         if entity_vel.length() == 0.0 {
+            if let Some(entity_mut) = world.entities.get_mut(entity_id) {
+                if entity_mut.move_sinus != 0.0 {
+                    entity_mut.move_sinus /= 2.0;
+
+                    if entity_mut.move_sinus.abs() < 0.01 {
+                        entity_mut.move_sinus = 0.0;
+                        entity_mut.move_distance_total = 0.0;
+                    }
+                }
+            }
             continue;
         }
 
@@ -65,7 +75,11 @@ pub fn movement_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
 
         // finally update entity position
         if let Some(entity_mut) = world.entities.get_mut(entity_id) {
+            let old_pos = entity_mut.pos;
+            let moved_distance = (entity_pos - old_pos).length();
+            entity_mut.move_distance_total += moved_distance;
             entity_mut.pos = entity_pos;
+            entity_mut.move_sinus = entity_mut.move_distance_total.sin();
         }
 
         // add entity to new tile

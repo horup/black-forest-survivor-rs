@@ -45,6 +45,11 @@ pub struct Entity {
 
     /// Time when the ability actives
     pub ability_activates_at_sec:f32,
+
+    pub move_sinus:f32,
+
+    /// total distance moved
+    pub move_distance_total:f32
 }
 
 impl Entity {
