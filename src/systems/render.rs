@@ -1,8 +1,8 @@
-use std::{collections::HashMap, f32::consts::E};
+use std::collections::HashMap;
 
 use glam::{IVec2, Vec4};
 
-use crate::{Ctx, Entity, TickEvent, World};
+use crate::{Ctx, TickEvent, World};
 
 pub fn render_system(_:&TickEvent, ctx: &mut dyn Ctx) {
     let Some(player) = ctx.world_mut().player() else { return; };
@@ -18,7 +18,7 @@ pub fn render_system(_:&TickEvent, ctx: &mut dyn Ctx) {
     for y in -draw_radius.ceil() as i32..=draw_radius.ceil() as i32 {
         for x in -draw_radius.ceil() as i32..=draw_radius.ceil() as i32 {
             let cell = player_index + glam::IVec2::new(x, y);
-            if let Some(tile) = ctx.world_mut().tiles.get(cell) {
+            if let Some(_) = ctx.world_mut().tiles.get(cell) {
                 let origin = glam::Vec3::new(cell.x as f32 + 0.5, cell.y as f32 + 0.5, 0.0);
                 let v = origin - player_pos;
                 let c = World::light(v.length());

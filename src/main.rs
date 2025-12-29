@@ -14,7 +14,7 @@ pub use entity::*;
 mod tile;
 pub use tile::*;
 
-use ggsdk::{GGAtlas, GGRunOptions, egui::Key};
+use ggsdk::{GGAtlas, GGRunOptions, egui::{Key, TextureId}};
 use glam::{Vec2, Vec3, Vec4};
 use glox::{Camera, FirstPersonCamera, Glox};
 
@@ -166,6 +166,9 @@ impl ggsdk::GGApp for App {
             gl.clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
         }
 
+        let mut current_texture_id: Option<TextureId> = None;
+        let mut draw = self.glox.draw_builder(gl, &self.fps_camera);
+        
         for command in self.command_queue.drain(..) {
             match command {
                 AppCommand::DrawTile {
@@ -176,11 +179,20 @@ impl ggsdk::GGApp for App {
                     let Some(texture) = g.assets.get::<GGAtlas>(&texture) else {
                         continue;
                     };
-                    let texture = g.painter.texture(texture.texture_id()).unwrap();
-                    let mut draw = self.glox.draw_builder(gl, &self.fps_camera);
-                    draw.bind_texture(Some(texture));
+                    let texture_id = texture.texture_id();
+                    
+                    // If texture changed, finish current batch and start new one
+                    if current_texture_id != Some(texture_id) {
+                        if current_texture_id.is_some() {
+                            draw.finish();
+                            draw = self.glox.draw_builder(gl, &self.fps_camera);
+                        }
+                        let texture = g.painter.texture(texture_id).unwrap();
+                        draw.bind_texture(Some(texture));
+                        current_texture_id = Some(texture_id);
+                    }
+                    
                     draw.push_vertices(&glox::floor_vertices(origin, color));
-                    draw.finish();
                 }
                 AppCommand::DrawSprite {
                     origin,
@@ -191,13 +203,27 @@ impl ggsdk::GGApp for App {
                     let Some(texture) = g.assets.get::<GGAtlas>(&texture) else {
                         continue;
                     };
-                    let texture = g.painter.texture(texture.texture_id()).unwrap();
-                    let mut draw = self.glox.draw_builder(gl, &self.fps_camera);
-                    draw.bind_texture(Some(texture));
+                    let texture_id = texture.texture_id();
+                    
+                    // If texture changed, finish current batch and start new one
+                    if current_texture_id != Some(texture_id) {
+                        if current_texture_id.is_some() {
+                            draw.finish();
+                            draw = self.glox.draw_builder(gl, &self.fps_camera);
+                        }
+                        let texture = g.painter.texture(texture_id).unwrap();
+                        draw.bind_texture(Some(texture));
+                        current_texture_id = Some(texture_id);
+                    }
+                    
                     draw.push_vertices(&glox::billboard_vertices(origin, color, camera_dir, scale));
-                    draw.finish();
                 }
             }
+        }
+        
+        // Finish the final batch if any commands were processed
+        if current_texture_id.is_some() {
+            draw.finish();
         }
 
         self.glox.swap();

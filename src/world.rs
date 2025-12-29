@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use glam::{IVec2, Vec3};
+use glam::IVec2;
 use slotmap::DefaultKey;
 
 use crate::{Event, entity::Entity, tile::Tile};
