@@ -46,9 +46,12 @@ pub struct Entity {
     /// Time when the ability actives
     pub ability_activates_at_sec:f32,
 
+    /// sinus value for movement animation
+    /// used for e.g. bobbing up and down while walking
     pub move_sinus:f32,
 
     /// total distance moved
+    /// reset when move_sinus is reset
     pub move_distance_total:f32
 }
 
