@@ -1,4 +1,6 @@
 mod systems;
+use std::collections::VecDeque;
+
 pub use systems::*;
 mod world;
 pub use world::*;
@@ -22,6 +24,21 @@ struct App {
     pub glox: Glox,
     pub fps_camera: FirstPersonCamera,
     pub world: World,
+    pub command_queue: VecDeque<AppCommand>,
+}
+
+enum AppCommand {
+    DrawTile {
+        origin: Vec3,
+        texture: String,
+        color: [f32; 4],
+    },
+    DrawSprite {
+        origin: Vec3,
+        texture: String,
+        color: [f32; 4],
+        scale: Vec2,
+    },
 }
 
 impl Ctx for App {
@@ -31,6 +48,23 @@ impl Ctx for App {
     
     fn rand_u32(&mut self) -> u32 {
         rand::random::<u32>()
+    }
+
+    fn draw_tile(&mut self, origin:Vec3, texture:&str, color: [f32;4]) {
+        self.command_queue.push_back(AppCommand::DrawTile {
+            origin,
+            texture: texture.to_string(),
+            color,
+        });
+    }
+
+    fn draw_sprite(&mut self, origin:Vec3, texture:&str, color:[f32;4], scale:Vec2) {
+        self.command_queue.push_back(AppCommand::DrawSprite {
+            origin,
+            texture: texture.to_string(),
+            color,
+            scale,
+        });
     }
 }
 
