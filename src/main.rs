@@ -13,10 +13,8 @@ pub use entity::*;
 mod tile;
 pub use tile::*;
 
-use ggsdk::{
-    GGAtlas, GGRunOptions, egui::Key
-};
-use glam::{Vec2, Vec3};
+use ggsdk::{GGAtlas, GGRunOptions, egui::Key};
+use glam::{Vec2, Vec3, Vec4};
 use glox::{FirstPersonCamera, Glox};
 
 #[derive(Default)]
@@ -31,12 +29,12 @@ enum AppCommand {
     DrawTile {
         origin: Vec3,
         texture: String,
-        color: [f32; 4],
+        color: Vec4,
     },
     DrawSprite {
         origin: Vec3,
         texture: String,
-        color: [f32; 4],
+        color: Vec4,
         scale: Vec2,
     },
 }
@@ -45,12 +43,12 @@ impl Ctx for App {
     fn world_mut(&mut self) -> &mut World {
         &mut self.world
     }
-    
+
     fn rand_u32(&mut self) -> u32 {
         rand::random::<u32>()
     }
 
-    fn draw_tile(&mut self, origin:Vec3, texture:&str, color: [f32;4]) {
+    fn draw_tile(&mut self, origin: Vec3, texture: &str, color: Vec4) {
         self.command_queue.push_back(AppCommand::DrawTile {
             origin,
             texture: texture.to_string(),
@@ -58,7 +56,7 @@ impl Ctx for App {
         });
     }
 
-    fn draw_sprite(&mut self, origin:Vec3, texture:&str, color:[f32;4], scale:Vec2) {
+    fn draw_sprite(&mut self, origin: Vec3, texture: &str, color: Vec4, scale: Vec2) {
         self.command_queue.push_back(AppCommand::DrawSprite {
             origin,
             texture: texture.to_string(),
@@ -77,12 +75,12 @@ impl ggsdk::GGApp for App {
             .load::<GGAtlas>("assets/textures/grass.png", "grass");
         g.assets
             .load::<GGAtlas>("assets/textures/torch.png", "torch");
-        g.assets
-            .load::<GGAtlas>("assets/textures/axe.png", "axe");
-        g.assets
-            .load::<GGAtlas>("assets/textures/tree.png", "tree");
+        g.assets.load::<GGAtlas>("assets/textures/axe.png", "axe");
+        g.assets.load::<GGAtlas>("assets/textures/tree.png", "tree");
 
-        self.world.events.push_front(Event::Restart(RestartEvent {}));
+        self.world
+            .events
+            .push_front(Event::Restart(RestartEvent {}));
     }
 
     fn update(&mut self, g: ggsdk::UpdateContext) {
@@ -129,22 +127,27 @@ impl ggsdk::GGApp for App {
             }
         });
 
-
         let current_camera_pos = self.fps_camera.eye;
         self.fps_camera.move_self_horizontal(move_dir.extend(0.0));
         let new_camera_pos = self.fps_camera.eye;
         self.fps_camera.change_yaw(-pointer_delta.x / 100.0);
         let facing = self.fps_camera.yaw();
         let move_dir = new_camera_pos - current_camera_pos;
-        self.world.events.push_back(Event::PlayerInput(PlayerInputEvent {
-            player_id: self.world.player,
-            move_dir: move_dir.normalize_or_zero(),
-            facing,
-            use_ability, 
-        }));
-        self.world.events.push_back(Event::Tick(TickEvent { dt: g.dt }));
+        self.world
+            .events
+            .push_back(Event::PlayerInput(PlayerInputEvent {
+                player_id: self.world.player,
+                move_dir: move_dir.normalize_or_zero(),
+                facing,
+                use_ability,
+            }));
+        self.world
+            .events
+            .push_back(Event::Tick(TickEvent { dt: g.dt }));
         systems::process(self);
-        self.world.events.push_back(Event::PostTick(TickEvent { dt: g.dt }) );
+        self.world
+            .events
+            .push_back(Event::PostTick(TickEvent { dt: g.dt }));
         systems::process(self);
     }
 
@@ -154,56 +157,44 @@ impl ggsdk::GGApp for App {
         };
         let player_pos = player.pos;
         self.fps_camera.eye = player_pos + Vec3::new(0.0, 0.0, 0.5);
-        
-        //render::render_3d_world(&self.world, &self.fps_camera, &mut self.glox, &g);
+
+        let gl = g.painter.gl();
 
         while let Some(command) = self.command_queue.pop_front() {
             match command {
-                AppCommand::DrawTile { origin, texture, color } => {
-                    //render::render_tile(&self.world, &self.fps_camera, &mut self.glox, &g, origin, &texture, color);
+                AppCommand::DrawTile {
+                    origin,
+                    texture,
+                    color,
+                } => {
+                    let Some(texture) = g.assets.get::<GGAtlas>(&texture) else {
+                        continue;
+                    };
+                    let texture = g.painter.texture(texture.texture_id()).unwrap();
+                    let mut draw = self.glox.draw_builder(gl, &self.fps_camera);
+                    draw.bind_texture(Some(texture));
+                    draw.push_vertices(&glox::floor_vertices(origin, color));
+                    draw.finish();
+
                 }
-                AppCommand::DrawSprite { origin, texture, color, scale } => {
-                    //render::render_sprite(&self.world, &self.fps_camera, &mut self.glox, &g, origin, &texture, color, scale);
+                AppCommand::DrawSprite {
+                    origin,
+                    texture,
+                    color,
+                    scale,
+                } => {
+                    let Some(texture) = g.assets.get::<GGAtlas>(&texture) else {
+                        continue;
+                    };
+                    let texture = g.painter.texture(texture.texture_id()).unwrap();
+                    let mut draw = self.glox.draw_builder(gl, &self.fps_camera);
+                    draw.bind_texture(Some(texture));
+                    //draw.push_vertices(&glox::floor_vertices(origin, color));
+                    draw.finish();
                 }
             }
         }
-    }
-}
 
-fn sat_test(pos1: &Vec3, half_size: f32, pos2: &Vec3, half_size2: f32) -> bool {
-    let delta = *pos2 - *pos1;
-    let overlap_x = half_size + half_size2 - delta.x.abs();
-    let overlap_y = half_size + half_size2 - delta.y.abs();
-    let overlap_z = half_size + half_size2 - delta.z.abs();
-
-    if overlap_x > 0.0 && overlap_y > 0.0 && overlap_z > 0.0 {
-        true
-    } else {
-        false
-    }
-}
-
-fn collision_resolve(pos1: &mut Vec3, half_size1: f32, pos2: &Vec3, half_size2: f32) {
-    if !sat_test(pos1, half_size1, pos2, half_size2) {
-        return;
-    }
-    let delta = *pos2 - *pos1;
-    let overlap_x = half_size1 + half_size2 - delta.x.abs();
-    let overlap_y = half_size1 + half_size2 - delta.y.abs();
-    // Z is ignored for collision resolution
-
-    if overlap_x < overlap_y {
-        if delta.x > 0.0 {
-            pos1.x -= overlap_x;
-        } else {
-            pos1.x += overlap_x;
-        }
-    } else {
-        if delta.y > 0.0 {
-            pos1.y -= overlap_y;
-        } else {
-            pos1.y += overlap_y;
-        }
     }
 }
 

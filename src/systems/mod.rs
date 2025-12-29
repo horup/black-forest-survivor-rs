@@ -19,7 +19,7 @@ pub use movement::movement_system;
 pub use restart::restart_system;
 pub use spawn::spawn_system;
 
-use glam::{Vec3, Vec2};
+use glam::{Vec2, Vec3, Vec4};
 
 pub trait Ctx {
     fn world_mut(&mut self) -> &mut World;
@@ -36,8 +36,8 @@ pub trait Ctx {
     fn rand_f32_range(&mut self, min: f32, max: f32) -> f32 {
         min + (max - min) * self.rand_f32()
     }
-    fn draw_tile(&mut self, origin:Vec3, texture:&str, color: [f32;4]);
-    fn draw_sprite(&mut self, origin:Vec3, texture:&str, color:[f32;4], scale:Vec2);
+    fn draw_tile(&mut self, origin:Vec3, texture:&str, color: Vec4);
+    fn draw_sprite(&mut self, origin:Vec3, texture:&str, color:Vec4, scale:Vec2);
 }
 
 pub fn process(ctx: &mut dyn Ctx) {

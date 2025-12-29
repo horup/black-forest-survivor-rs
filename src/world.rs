@@ -19,6 +19,14 @@ pub struct World {
 
 impl World {
 
+    pub fn draw_radius() -> f32 {
+        16.0
+    }
+
+    pub fn view_radius() -> f32 {
+        8.0
+    }
+
     /// Get all entity IDs in the world
     pub fn entities(&self, entities:&mut Vec<DefaultKey>) {
         for (entity_id, _) in self.entities.iter() {
