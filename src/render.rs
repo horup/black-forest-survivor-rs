@@ -1,4 +1,4 @@
-use crate::{entity::EntityVariant, World};
+use game_core::{entity::EntityVariant, World};
 use ggsdk::{GGAtlas, GGPainter, egui::{Color32, LayerId, Pos2, Rect}};
 use glam::{IVec2, Vec2, Vec3, Vec4};
 use glow::HasContext;

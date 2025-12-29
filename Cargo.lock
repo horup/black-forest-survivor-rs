@@ -316,6 +316,7 @@ name = "black-forest-survivor"
 version = "0.1.0"
 dependencies = [
  "endlessgrid",
+ "game_core",
  "ggsdk",
  "glam",
  "glow",
@@ -1260,6 +1261,18 @@ dependencies = [
  "pin-project-lite",
  "pin-utils",
  "slab",
+]
+
+[[package]]
+name = "game_core"
+version = "0.1.0"
+dependencies = [
+ "endlessgrid",
+ "ggsdk",
+ "glam",
+ "rand 0.9.2",
+ "shufflebag",
+ "slotmap",
 ]
 
 [[package]]

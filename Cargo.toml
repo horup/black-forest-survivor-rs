@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+game_core = { path = "game_core" }
 glox = "0.1.5"
 ggsdk = "0.1.10"
 glow = "0.16.0"

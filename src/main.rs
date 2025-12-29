@@ -1,18 +1,9 @@
-mod systems;
 use std::collections::VecDeque;
 
 use glow::HasContext;
-pub use systems::*;
-mod world;
-pub use world::*;
-mod event;
-pub use event::*;
+pub use game_core::*;
 mod render;
 pub use render::*;
-mod entity;
-pub use entity::*;
-mod tile;
-pub use tile::*;
 
 use ggsdk::{GGAtlas, GGRunOptions, egui::{Key, TextureId}};
 use glam::{Vec2, Vec3, Vec4};
