@@ -38,7 +38,6 @@ pub fn render_ui(world:&World, g: &ggsdk::UpdateContext) {
 
     let Some(player) = world.entities.get(world.player) else { return; };
     let cooldown = player.ability_delta();
-    dbg!(cooldown);
     if cooldown == 1.0 {
         // not on cooldown, draw normally
         let y = h / 4.0;
