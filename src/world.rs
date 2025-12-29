@@ -32,7 +32,7 @@ impl World {
     }
 
     pub fn draw_radius() -> f32 {
-        16.0
+        8.0
     }
 
     pub fn view_radius() -> f32 {
