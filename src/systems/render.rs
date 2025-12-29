@@ -47,7 +47,4 @@ pub fn render_system(_:&TickEvent, ctx: &mut dyn Ctx) {
             ctx.draw_sprite(origin, "tree", color, sprite_size);
         }
     }
-
-
-
 }

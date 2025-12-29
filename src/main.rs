@@ -199,6 +199,8 @@ impl ggsdk::GGApp for App {
                 }
             }
         }
+
+        self.glox.swap();
     }
 }
 
