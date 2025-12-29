@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use glam::IVec2;
+use glam::{IVec2, Vec3};
 use slotmap::DefaultKey;
 
 use crate::{Event, entity::Entity, tile::Tile};
@@ -18,6 +18,18 @@ pub struct World {
 }
 
 impl World {
+    pub fn light(d:f32) -> f32 {
+        let max_distance = Self::view_radius();
+        let d = d / max_distance;
+        let d = 1.0 - d;
+        if d < 0.0 {
+            0.0
+        } else if d > 1.0 {
+            1.0
+        } else {
+            d
+        }
+    }
 
     pub fn draw_radius() -> f32 {
         16.0

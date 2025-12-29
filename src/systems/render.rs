@@ -21,7 +21,8 @@ pub fn render_system(_:&TickEvent, ctx: &mut dyn Ctx) {
             let cell = player_index + glam::IVec2::new(x, y);
             if let Some(tile) = ctx.world_mut().tiles.get(cell) {
                 let origin = glam::Vec3::new(cell.x as f32 + 0.5, cell.y as f32 + 0.5, 0.0);
-                let c = 1.0;
+                let v = origin - player_pos;
+                let c = World::light(v.length());
                 let color = Vec4::new(c, c, c, c);
                 ctx.draw_tile(origin, "grass", color);
                 tiles.insert(cell, ());
@@ -41,7 +42,9 @@ pub fn render_system(_:&TickEvent, ctx: &mut dyn Ctx) {
     for e in entities.iter() {
         if let Some(e) = ctx.world_mut().entities.get(*e) {
             let origin = e.pos;
-            let c = 1.0;
+            let v = origin - player_pos;
+            let d = v.length();
+            let c = World::light(d);
             let color = Vec4::new(c, c, c, c);
             let sprite_size = e.sprite_size;
             ctx.draw_sprite(origin, "tree", color, sprite_size);

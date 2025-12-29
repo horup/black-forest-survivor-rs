@@ -166,7 +166,7 @@ impl ggsdk::GGApp for App {
             gl.clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
         }
 
-        while let Some(command) = self.command_queue.pop_front() {
+        for command in self.command_queue.drain(..) {
             match command {
                 AppCommand::DrawTile {
                     origin,
