@@ -32,16 +32,24 @@ pub fn render_ui(world:&World, g: &ggsdk::UpdateContext) {
     let h = screen_size.y;
     let w = h / 2.0;
 
-    painter.atlas(&torch, 0, Rect::from_min_max(Pos2::new(0.0, 0.0), Pos2::new(w, screen_size.y)), Color32::WHITE);
+    let Some(player) = world.entities.get(world.player) else { return; };
+    {
+        let f = h / 20.0;
+        let x = 0.0;//-player.move_sinus * f;
+        let y = (player.move_sinus + 1.0) * f;
+        painter.atlas(&torch, 0, Rect::from_min_max(Pos2::new(x, y), Pos2::new(w + x, screen_size.y + y)), Color32::WHITE);
+    }
 
     let Some(axe) = g.assets.get::<GGAtlas>("axe") else { return; };
 
-    let Some(player) = world.entities.get(world.player) else { return; };
+  
     let cooldown = player.ability_delta();
     if cooldown == 1.0 {
         // not on cooldown, draw normally
-        let y = h / 4.0;
-        painter.atlas(&axe, 0, Rect::from_min_max(Pos2::new(screen_size.x - w, y), Pos2::new(screen_size.x, screen_size.y + y)), Color32::WHITE);
+        let f = h / 20.0;
+        let x = player.move_sinus * f;
+        let y = h / 4.0 + player.move_sinus * f;
+        painter.atlas(&axe, 0, Rect::from_min_max(Pos2::new(screen_size.x - w + x, y), Pos2::new(screen_size.x + x, screen_size.y + y)), Color32::WHITE);
     } else {
         let y = cooldown * 2.0 * h;
         let x = -cooldown * 3.0 *w;
