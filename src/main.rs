@@ -1,6 +1,7 @@
 mod systems;
 use std::collections::VecDeque;
 
+use glow::HasContext;
 pub use systems::*;
 mod world;
 pub use world::*;
@@ -15,7 +16,7 @@ pub use tile::*;
 
 use ggsdk::{GGAtlas, GGRunOptions, egui::Key};
 use glam::{Vec2, Vec3, Vec4};
-use glox::{FirstPersonCamera, Glox};
+use glox::{Camera, FirstPersonCamera, Glox};
 
 #[derive(Default)]
 struct App {
@@ -157,8 +158,13 @@ impl ggsdk::GGApp for App {
         };
         let player_pos = player.pos;
         self.fps_camera.eye = player_pos + Vec3::new(0.0, 0.0, 0.5);
-
+        let camera_dir = self.fps_camera.direction();
         let gl = g.painter.gl();
+
+        unsafe {
+            gl.enable(glow::DEPTH_TEST);
+            gl.clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
+        }
 
         while let Some(command) = self.command_queue.pop_front() {
             match command {
@@ -175,7 +181,6 @@ impl ggsdk::GGApp for App {
                     draw.bind_texture(Some(texture));
                     draw.push_vertices(&glox::floor_vertices(origin, color));
                     draw.finish();
-
                 }
                 AppCommand::DrawSprite {
                     origin,
@@ -189,12 +194,11 @@ impl ggsdk::GGApp for App {
                     let texture = g.painter.texture(texture.texture_id()).unwrap();
                     let mut draw = self.glox.draw_builder(gl, &self.fps_camera);
                     draw.bind_texture(Some(texture));
-                    //draw.push_vertices(&glox::floor_vertices(origin, color));
+                    draw.push_vertices(&glox::billboard_vertices(origin, color, camera_dir, scale));
                     draw.finish();
                 }
             }
         }
-
     }
 }
 
