@@ -6,6 +6,7 @@ use crate::entity::EntityVariant;
 #[derive(Clone)]
 pub enum Event {
     Tick(TickEvent),
+    PostTick(TickEvent),
     Collision(CollisionEvent),
     Restart(RestartEvent),
     Spawn(SpawnEvent),

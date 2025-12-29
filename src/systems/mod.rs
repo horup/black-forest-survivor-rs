@@ -1,4 +1,4 @@
-use crate::{World, event::Event};
+use crate::{World, event::Event, systems::render::render_system};
 
 mod ability;
 mod collision;
@@ -8,6 +8,7 @@ mod map_entities;
 mod movement;
 mod restart;
 mod spawn;
+mod render;
 
 pub use ability::{ability_activated_system, ability_cooldown_system};
 pub use collision::collision_system;
@@ -63,6 +64,11 @@ pub fn process(ctx: &mut dyn Ctx) {
             Event::AbilityActived(ability_actived_event) => {
                 ability_activated_system(&ability_actived_event, ctx);
             },
+            Event::PostTick(tick_event) => {
+                render_system(&tick_event, ctx);
+            },
         }
     }
+
+    
 }

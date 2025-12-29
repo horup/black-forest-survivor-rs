@@ -144,6 +144,8 @@ impl ggsdk::GGApp for App {
         }));
         self.world.events.push_back(Event::Tick(TickEvent { dt: g.dt }));
         systems::process(self);
+        self.world.events.push_back(Event::PostTick(TickEvent { dt: g.dt }) );
+        systems::process(self);
     }
 
     fn paint_glow(&mut self, g: ggsdk::PaintGlowContext) {
@@ -153,7 +155,18 @@ impl ggsdk::GGApp for App {
         let player_pos = player.pos;
         self.fps_camera.eye = player_pos + Vec3::new(0.0, 0.0, 0.5);
         
-        render::render_3d_world(&self.world, &self.fps_camera, &mut self.glox, &g);
+        //render::render_3d_world(&self.world, &self.fps_camera, &mut self.glox, &g);
+
+        while let Some(command) = self.command_queue.pop_front() {
+            match command {
+                AppCommand::DrawTile { origin, texture, color } => {
+                    //render::render_tile(&self.world, &self.fps_camera, &mut self.glox, &g, origin, &texture, color);
+                }
+                AppCommand::DrawSprite { origin, texture, color, scale } => {
+                    //render::render_sprite(&self.world, &self.fps_camera, &mut self.glox, &g, origin, &texture, color, scale);
+                }
+            }
+        }
     }
 }
 
