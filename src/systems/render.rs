@@ -10,7 +10,6 @@ pub fn render_system(_:&TickEvent, ctx: &mut dyn Ctx) {
     let player_pos = player.pos;
 
     let draw_radius = World::draw_radius();
-    let view_radius = World::view_radius();
 
     let mut tiles:HashMap<IVec2, ()> = HashMap::new();
     let mut entities = Vec::new();
