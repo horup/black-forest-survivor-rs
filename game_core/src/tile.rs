@@ -1,4 +1,5 @@
-use ggsdk::egui::ahash::HashMap;
+use std::collections::HashMap;
+
 use slotmap::DefaultKey;
 
 #[derive(Clone, Default)]
