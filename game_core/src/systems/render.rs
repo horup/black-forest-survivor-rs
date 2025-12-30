@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use glam::{IVec2, Vec4};
 
-use crate::{TickEvent, World, systems::Ctx};
+use crate::{Texture, TickEvent, World, systems::Ctx};
 
 pub fn render_system(_:&TickEvent, ctx: &mut dyn Ctx) {
     let Some(player) = ctx.world_mut().player() else { return; };
@@ -23,7 +23,7 @@ pub fn render_system(_:&TickEvent, ctx: &mut dyn Ctx) {
                 let v = origin - player_pos;
                 let c = World::light(v.length());
                 let color = Vec4::new(c, c, c, c);
-                ctx.draw_tile(origin, "grass", color);
+                ctx.draw_tile(origin, Texture::Grass, color);
                 tiles.insert(cell, ());
             }
         }
@@ -46,7 +46,8 @@ pub fn render_system(_:&TickEvent, ctx: &mut dyn Ctx) {
             let c = World::light(d);
             let color = Vec4::new(c, c, c, c);
             let sprite_size = e.sprite_size;
-            ctx.draw_sprite(origin, "zombie", color, sprite_size);
+            let texture = e.texture;
+            ctx.draw_sprite(origin, texture, color, sprite_size);
         }
     }
 }

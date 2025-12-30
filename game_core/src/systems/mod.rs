@@ -1,4 +1,4 @@
-use crate::{World, event::Event, systems::render::render_system};
+use crate::{Texture, World, event::Event, systems::render::render_system};
 
 mod ability;
 mod collision;
@@ -36,8 +36,8 @@ pub trait Ctx {
     fn rand_f32_range(&mut self, min: f32, max: f32) -> f32 {
         min + (max - min) * self.rand_f32()
     }
-    fn draw_tile(&mut self, origin:Vec3, texture:&str, color: Vec4);
-    fn draw_sprite(&mut self, origin:Vec3, texture:&str, color:Vec4, scale:Vec2);
+    fn draw_tile(&mut self, origin:Vec3, texture:Texture, color: Vec4);
+    fn draw_sprite(&mut self, origin:Vec3, texture:Texture, color:Vec4, scale:Vec2);
 }
 
 pub fn process(ctx: &mut dyn Ctx) {

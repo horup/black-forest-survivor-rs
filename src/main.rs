@@ -32,6 +32,15 @@ enum AppCommand {
     },
 }
 
+fn texture_to_string(texture: Texture) -> String {
+    match texture {
+        Texture::None => Default::default(),
+        Texture::Tree1 => "tree".to_string(),
+        Texture::Zombie1 => "zombie".to_string(),
+        Texture::Grass => "grass".to_string(),
+    }
+}
+
 impl Ctx for App {
     fn world_mut(&mut self) -> &mut World {
         &mut self.world
@@ -41,18 +50,18 @@ impl Ctx for App {
         rand::random::<u32>()
     }
 
-    fn draw_tile(&mut self, origin: Vec3, texture: &str, color: Vec4) {
+    fn draw_tile(&mut self, origin: Vec3, texture: Texture, color: Vec4) {
         self.command_queue.push_back(AppCommand::DrawTile {
             origin,
-            texture: texture.to_string(),
+            texture: texture_to_string(texture),
             color,
         });
     }
 
-    fn draw_sprite(&mut self, origin: Vec3, texture: &str, color: Vec4, scale: Vec2) {
+    fn draw_sprite(&mut self, origin: Vec3, texture: Texture, color: Vec4, scale: Vec2) {
         self.command_queue.push_back(AppCommand::DrawSprite {
             origin,
-            texture: texture.to_string(),
+            texture: texture_to_string(texture),
             color,
             scale,
         });
