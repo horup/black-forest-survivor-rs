@@ -2,7 +2,7 @@
 pub enum Texture {
     None,
     Tree1,
-    Zombie,
+    Zombie1,
     Grass
 }
 

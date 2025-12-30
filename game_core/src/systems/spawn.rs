@@ -28,10 +28,14 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
             let h = ctx.rand_f32_range(1.5, 2.5);
             let e = ctx.world_mut().entity_mut(id).unwrap();
             e.radius = 0.1;
+            e.texture = crate::Texture::Tree1;
             e.sprite_size = glam::Vec2::new(w, h);
         },
         EntityVariant::Zombie => {
-            
+            let e = ctx.world_mut().entity_mut(id).unwrap();
+            e.texture = crate::Texture::Zombie1;
+            e.sprite_size = glam::Vec2::new(1.0, 1.5);
+
         }
         EntityVariant::Unknown => {}
     }
