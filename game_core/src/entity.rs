@@ -1,5 +1,7 @@
 use glam::{Vec2, Vec3};
 
+use crate::Texture;
+
 #[derive(Clone, Copy)]
 pub enum EntityVariant {
     Unknown,
@@ -21,6 +23,9 @@ pub struct Entity {
 
     /// Variant of this entity, such as a player, monster, item, etc. 
     pub variant: EntityVariant,
+
+    /// Texture used to represent this entity
+    pub texture: Texture,
 
     /// Movement direction of this entity
     /// Normalized from 0..1

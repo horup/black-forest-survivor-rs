@@ -6,6 +6,7 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
         pos: spawn_event.pos,
         variant: spawn_event.variant,
         move_dir: Default::default(),
+        texture: Default::default(),
         facing: 0.0,
         solid: true,
         radius: 0.4,

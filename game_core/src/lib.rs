@@ -9,5 +9,5 @@ pub use entity::*;
 mod tile;
 pub use tile::*;
 
-mod textures;
-pub use textures::*;
+mod texture;
+pub use texture::*;

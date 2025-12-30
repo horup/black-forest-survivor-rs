@@ -1,13 +1,13 @@
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Textures {
+pub enum Texture {
     None,
     Tree1,
     Zombie,
     Grass
 }
 
-impl Default for Textures {
+impl Default for Texture {
     fn default() -> Self {
-        Textures::None
+        Texture::None
     }
 }
