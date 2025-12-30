@@ -1,10 +1,13 @@
 pub mod systems;
-pub use systems::*;
-pub mod world;
+
+mod world;
 pub use world::*;
-pub mod event;
+mod event;
 pub use event::*;
-pub mod entity;
+mod entity;
 pub use entity::*;
-pub mod tile;
+mod tile;
 pub use tile::*;
+
+mod textures;
+pub use textures::*;

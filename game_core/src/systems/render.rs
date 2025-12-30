@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use glam::{IVec2, Vec4};
 
-use crate::{Ctx, TickEvent, World};
+use crate::{TickEvent, World, systems::Ctx};
 
 pub fn render_system(_:&TickEvent, ctx: &mut dyn Ctx) {
     let Some(player) = ctx.world_mut().player() else { return; };
@@ -46,7 +46,7 @@ pub fn render_system(_:&TickEvent, ctx: &mut dyn Ctx) {
             let c = World::light(d);
             let color = Vec4::new(c, c, c, c);
             let sprite_size = e.sprite_size;
-            ctx.draw_sprite(origin, "tree", color, sprite_size);
+            ctx.draw_sprite(origin, "zombie", color, sprite_size);
         }
     }
 }

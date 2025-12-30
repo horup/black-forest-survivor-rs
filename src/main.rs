@@ -1,5 +1,6 @@
 use std::collections::VecDeque;
 
+use game_core::systems::Ctx;
 use glow::HasContext;
 pub use game_core::*;
 mod render;
@@ -69,6 +70,7 @@ impl ggsdk::GGApp for App {
             .load::<GGAtlas>("assets/textures/torch.png", "torch");
         g.assets.load::<GGAtlas>("assets/textures/axe.png", "axe");
         g.assets.load::<GGAtlas>("assets/textures/tree.png", "tree");
+        g.assets.load::<GGAtlas>("assets/textures/zombie.png", "zombie");
 
         self.world
             .events
