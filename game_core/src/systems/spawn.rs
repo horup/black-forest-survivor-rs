@@ -29,6 +29,9 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
             e.radius = 0.1;
             e.sprite_size = glam::Vec2::new(w, h);
         },
-        _ => {}
+        EntityVariant::Zombie => {
+            
+        }
+        EntityVariant::Unknown => {}
     }
 }

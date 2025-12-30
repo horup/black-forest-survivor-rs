@@ -4,7 +4,8 @@ use glam::{Vec2, Vec3};
 pub enum EntityVariant {
     Unknown,
     Player,
-    Tree
+    Tree,
+    Zombie
 }
 
 impl Default for EntityVariant {
