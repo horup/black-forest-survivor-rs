@@ -10,6 +10,7 @@ mod restart;
 mod spawn;
 mod render;
 mod despawn;
+mod bot;
 
 pub use ability::{ability_activated_system, ability_cooldown_system};
 pub use collision::collision_system;
@@ -20,6 +21,7 @@ pub use movement::movement_system;
 pub use restart::restart_system;
 pub use spawn::spawn_system;
 pub use despawn::despawn_system;
+pub use bot::bot_system;
 
 use glam::{Vec2, Vec3, Vec4};
 
@@ -51,6 +53,7 @@ pub fn process(ctx: &mut dyn Ctx) {
             Event::Tick(tick_event) => {
                 generate_map_system(&tick_event, ctx);
                 map_entities_to_tiles_system(&tick_event, ctx);
+                bot_system(&tick_event, ctx);
                 movement_system(&tick_event, ctx);
                 ability_cooldown_system(&tick_event, ctx);
             }

@@ -58,7 +58,10 @@ pub struct Entity {
 
     /// total distance moved
     /// reset when move_sinus is reset
-    pub move_distance_total:f32
+    pub move_distance_total:f32,
+
+    /// Maximum movement speed of this entity
+    pub max_speed: f32
 }
 
 impl Entity {

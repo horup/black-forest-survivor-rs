@@ -16,6 +16,7 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
         ability_timer_total_sec: 1.0,
         move_sinus: 0.0,
         move_distance_total: 0.0,
+        max_speed: 0.0,
     });
 
     match spawn_event.variant {
@@ -24,6 +25,7 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
             ctx.world_mut().player = id;
             let e = ctx.world_mut().entity_mut(id).unwrap();
             e.ability_timer_total_sec = 0.5;
+            e.max_speed = 5.0;
             
         },
         EntityVariant::Tree => {
@@ -38,6 +40,7 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
             let e = ctx.world_mut().entity_mut(id).unwrap();
             e.texture = crate::Texture::Zombie1;
             e.sprite_size = glam::Vec2::new(0.5, 0.75);
+            e.max_speed = 1.0;
 
         }
         EntityVariant::Unknown => {}

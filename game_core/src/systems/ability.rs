@@ -1,4 +1,4 @@
-use glam::{Vec2, Vec4};
+use glam::Vec2;
 
 use crate::{AbilityActivedEvent, DespawnEvent, TickEvent, event::Event, math};
 use super::Ctx;

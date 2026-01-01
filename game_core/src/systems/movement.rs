@@ -6,7 +6,6 @@ use super::Ctx;
 /// also handled collision resolution
 pub fn movement_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
     let dt = tick_event.dt;
-    let max_speed = 5.0;
     let world = ctx.world_mut();
     let mut entities = Vec::new();
     world.entities(&mut entities);
@@ -18,7 +17,7 @@ pub fn movement_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
         let Some(entity) = world.entity(entity_id) else {
             continue;
         };
-        let entity_vel = entity.move_dir * dt * max_speed;
+        let entity_vel = entity.move_dir * dt * entity.max_speed;
         let entity_pos = entity.pos;
         let entity_solid = entity.solid;
         let entity_radius = entity.radius;
