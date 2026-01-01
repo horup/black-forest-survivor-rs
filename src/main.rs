@@ -16,6 +16,7 @@ struct App {
     pub fps_camera: FirstPersonCamera,
     pub world: World,
     pub command_queue: VecDeque<AppCommand>,
+    pub flash_color: Option<Vec4>,
 }
 
 enum AppCommand {
@@ -29,6 +30,9 @@ enum AppCommand {
         texture: String,
         color: Vec4,
         scale: Vec2,
+    },
+    DrawFlash {
+        color: Vec4,
     },
 }
 
@@ -66,6 +70,10 @@ impl Ctx for App {
             scale,
         });
     }
+
+    fn draw_flash(&mut self, color: Vec4) {
+        self.command_queue.push_back(AppCommand::DrawFlash { color });
+    }
 }
 
 impl ggsdk::GGApp for App {
@@ -88,6 +96,22 @@ impl ggsdk::GGApp for App {
 
     fn update(&mut self, g: ggsdk::UpdateContext) {
         render::render_ui(&self.world, &g);
+        
+        // Render flash overlay if present
+        if let Some(color) = self.flash_color {
+            let painter = g.egui_ctx.layer_painter(ggsdk::egui::LayerId::background());
+            let screen_rect = g.egui_ctx.input(|i| i.content_rect());
+            let color32 = ggsdk::egui::Color32::from_rgba_premultiplied(
+                (color.x * 255.0) as u8,
+                (color.y * 255.0) as u8,
+                (color.z * 255.0) as u8,
+                (color.w * 255.0) as u8,
+            );
+            painter.rect_filled(screen_rect, 0.0, color32);
+            
+            // Clear flash after rendering
+            self.flash_color = None;
+        }
     }
 
     fn update_glow(&mut self, g: ggsdk::UpdateContext) {
@@ -219,6 +243,10 @@ impl ggsdk::GGApp for App {
                     }
                     
                     draw.push_vertices(&glox::billboard_vertices(origin, color, camera_dir, scale));
+                }
+                AppCommand::DrawFlash { color } => {
+                    // Store flash color to be rendered in the update method
+                    self.flash_color = Some(color);
                 }
             }
         }
