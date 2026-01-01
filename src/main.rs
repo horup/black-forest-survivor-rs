@@ -17,6 +17,7 @@ struct App {
     pub world: World,
     pub command_queue: VecDeque<AppCommand>,
     pub flash_color: Option<Vec4>,
+    pub overlay_color: Option<Vec4>,
 }
 
 enum AppCommand {
@@ -32,6 +33,9 @@ enum AppCommand {
         scale: Vec2,
     },
     DrawFlash {
+        color: Vec4,
+    },
+    DrawOverlay {
         color: Vec4,
     },
 }
@@ -74,6 +78,10 @@ impl Ctx for App {
     fn draw_flash(&mut self, color: Vec4) {
         self.command_queue.push_back(AppCommand::DrawFlash { color });
     }
+
+    fn draw_overlay(&mut self, color: Vec4) {
+        self.command_queue.push_back(AppCommand::DrawOverlay { color });
+    }
 }
 
 impl ggsdk::GGApp for App {
@@ -111,6 +119,22 @@ impl ggsdk::GGApp for App {
             
             // Clear flash after rendering
             self.flash_color = None;
+        }
+        
+        // Render overlay if present
+        if let Some(color) = self.overlay_color {
+            let painter = g.egui_ctx.layer_painter(ggsdk::egui::LayerId::background());
+            let screen_rect = g.egui_ctx.input(|i| i.content_rect());
+            let color32 = ggsdk::egui::Color32::from_rgba_premultiplied(
+                (color.x * 255.0) as u8,
+                (color.y * 255.0) as u8,
+                (color.z * 255.0) as u8,
+                (color.w * 255.0) as u8,
+            );
+            painter.rect_filled(screen_rect, 0.0, color32);
+            
+            // Clear overlay after rendering
+            self.overlay_color = None;
         }
     }
 
@@ -247,6 +271,10 @@ impl ggsdk::GGApp for App {
                 AppCommand::DrawFlash { color } => {
                     // Store flash color to be rendered in the update method
                     self.flash_color = Some(color);
+                }
+                AppCommand::DrawOverlay { color } => {
+                    // Store overlay color to be rendered in the update method
+                    self.overlay_color = Some(color);
                 }
             }
         }

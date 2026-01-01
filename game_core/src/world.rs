@@ -14,7 +14,9 @@ pub struct World {
     /// The players entity id
     pub player: slotmap::DefaultKey,
     /// Unprocessed events
-    pub events:VecDeque<Event>
+    pub events:VecDeque<Event>,
+    /// Time elapsed for fade-in effect (in seconds)
+    pub fade_in_time: f32,
 }
 
 impl World {

@@ -4,7 +4,7 @@ use glam::{IVec2, Vec4};
 
 use crate::{Texture, TickEvent, World, systems::Ctx};
 
-pub fn render_system(_:&TickEvent, ctx: &mut dyn Ctx) {
+pub fn render_system(event:&TickEvent, ctx: &mut dyn Ctx) {
     let Some(player) = ctx.world_mut().player() else { return; };
     let player_index = player.tile_index();
     let player_pos = player.pos;
@@ -49,5 +49,12 @@ pub fn render_system(_:&TickEvent, ctx: &mut dyn Ctx) {
             let texture = e.texture;
             ctx.draw_sprite(origin, texture, color, sprite_size);
         }
+    }
+    
+    // Update and render fade-in effect
+    ctx.world_mut().fade_in_time += event.dt;
+    if ctx.world_mut().fade_in_time < 2.0 {
+        let alpha = (1.0 - (ctx.world_mut().fade_in_time / 2.0)).clamp(0.0, 1.0);
+        ctx.draw_overlay(Vec4::new(0.0, 0.0, 0.0, alpha));
     }
 }
