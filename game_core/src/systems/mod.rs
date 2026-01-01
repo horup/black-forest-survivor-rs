@@ -43,8 +43,6 @@ pub trait Ctx {
     /// Draws a full-screen flash with the specified color (RGBA, values 0.0-1.0).
     /// The alpha channel controls the opacity of the flash.
     fn draw_flash(&mut self, color: Vec4);
-    /// Draws a full-screen overlay with the specified color (RGBA, values 0.0-1.0).
-    fn draw_overlay(&mut self, color: Vec4);
 }
 
 pub fn process(ctx: &mut dyn Ctx) {

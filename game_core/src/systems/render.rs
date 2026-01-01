@@ -55,6 +55,6 @@ pub fn render_system(event:&TickEvent, ctx: &mut dyn Ctx) {
     ctx.world_mut().fade_in_time += event.dt;
     if ctx.world_mut().fade_in_time < 2.0 {
         let alpha = (1.0 - (ctx.world_mut().fade_in_time / 2.0)).clamp(0.0, 1.0);
-        ctx.draw_overlay(Vec4::new(0.0, 0.0, 0.0, alpha));
+        ctx.draw_flash(Vec4::new(0.0, 0.0, 0.0, alpha));
     }
 }
