@@ -9,6 +9,7 @@ mod movement;
 mod restart;
 mod spawn;
 mod render;
+mod despawn;
 
 pub use ability::{ability_activated_system, ability_cooldown_system};
 pub use collision::collision_system;
@@ -18,6 +19,7 @@ pub use map_entities::map_entities_to_tiles_system;
 pub use movement::movement_system;
 pub use restart::restart_system;
 pub use spawn::spawn_system;
+pub use despawn::despawn_system;
 
 use glam::{Vec2, Vec3, Vec4};
 
@@ -66,6 +68,9 @@ pub fn process(ctx: &mut dyn Ctx) {
             },
             Event::PostTick(tick_event) => {
                 render_system(&tick_event, ctx);
+            },
+            Event::Despawn(despawn_event) => {
+                despawn_system(&despawn_event, ctx);
             },
         }
     }
