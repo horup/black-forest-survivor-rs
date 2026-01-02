@@ -47,7 +47,15 @@ pub fn render_system(event:&TickEvent, ctx: &mut dyn Ctx) {
             let color = Vec4::new(c, c, c, c);
             let sprite_size = e.sprite_size;
             let texture = e.texture;
+            let floating_text = e.floating_text.clone();
+            
             ctx.draw_sprite(origin, texture, color, sprite_size);
+            
+            // Draw floating text if present
+            if let Some(text) = floating_text {
+                let text_pos = origin + glam::Vec3::new(0.0, 0.0, sprite_size.y * 1.0);
+                ctx.draw_text(text_pos, text, Vec4::new(c, c, c, 1.0));
+            }
         }
     }
     

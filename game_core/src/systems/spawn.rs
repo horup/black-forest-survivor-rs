@@ -17,6 +17,7 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
         move_sinus: 0.0,
         move_distance_total: 0.0,
         max_speed: 0.0,
+        floating_text: None,
     });
 
     match spawn_event.variant {
@@ -26,7 +27,6 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
             let e = ctx.world_mut().entity_mut(id).unwrap();
             e.ability_timer_total_sec = 0.5;
             e.max_speed = 5.0;
-            
         },
         EntityVariant::Tree => {
             let w = ctx.rand_f32_range(1.0, 1.3);
@@ -41,7 +41,7 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
             e.texture = crate::Texture::Zombie1;
             e.sprite_size = glam::Vec2::new(0.5, 0.75);
             e.max_speed = 1.0;
-
+            e.floating_text = Some("Zombie".to_string());
         }
         EntityVariant::Unknown => {}
     }

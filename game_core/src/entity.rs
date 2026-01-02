@@ -16,7 +16,7 @@ impl Default for EntityVariant {
     }
 }
 
-#[derive(Default, Clone, Copy)]
+#[derive(Default, Clone)]
 pub struct Entity {
     /// Position of this entity
     pub pos: glam::Vec3,
@@ -61,7 +61,10 @@ pub struct Entity {
     pub move_distance_total:f32,
 
     /// Maximum movement speed of this entity
-    pub max_speed: f32
+    pub max_speed: f32,
+
+    /// Optional text to display floating over the entity
+    pub floating_text: Option<String>,
 }
 
 impl Entity {

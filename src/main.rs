@@ -17,6 +17,7 @@ struct App {
     pub world: World,
     pub command_queue: VecDeque<AppCommand>,
     pub flash_color: Option<Vec4>,
+    pub text_commands: Vec<(Vec3, String, Vec4)>,
 }
 
 enum AppCommand {
@@ -32,6 +33,11 @@ enum AppCommand {
         scale: Vec2,
     },
     DrawFlash {
+        color: Vec4,
+    },
+    DrawText {
+        origin: Vec3,
+        text: String,
         color: Vec4,
     },
 }
@@ -74,6 +80,10 @@ impl Ctx for App {
     fn draw_flash(&mut self, color: Vec4) {
         self.command_queue.push_back(AppCommand::DrawFlash { color });
     }
+
+    fn draw_text(&mut self, origin: Vec3, text: String, color: Vec4) {
+        self.command_queue.push_back(AppCommand::DrawText { origin, text, color });
+    }
 }
 
 impl ggsdk::GGApp for App {
@@ -96,6 +106,27 @@ impl ggsdk::GGApp for App {
 
     fn update(&mut self, g: ggsdk::UpdateContext) {
         render::render_ui(&self.world, &g);
+        
+        // Render text commands that were extracted in paint_glow
+        let camera: &dyn Camera = &self.fps_camera;
+        for (origin, text, color) in self.text_commands.drain(..) {
+            let screen_pos = camera.world_to_screen(origin);
+            let painter = g.egui_ctx.layer_painter(ggsdk::egui::LayerId::background());
+            let color32 = ggsdk::egui::Color32::from_rgba_premultiplied(
+                (color.x * 255.0) as u8,
+                (color.y * 255.0) as u8,
+                (color.z * 255.0) as u8,
+                (color.w * 255.0) as u8,
+            );
+            let pos = ggsdk::egui::Pos2::new(screen_pos.x, screen_pos.y);
+            painter.text(
+                pos,
+                ggsdk::egui::Align2::CENTER_CENTER,
+                &text,
+                ggsdk::egui::FontId::proportional(20.0),
+                color32,
+            );
+        }
         
         // Render flash overlay if present
         if let Some(color) = self.flash_color {
@@ -247,6 +278,10 @@ impl ggsdk::GGApp for App {
                 AppCommand::DrawFlash { color } => {
                     // Store flash color to be rendered in the update method
                     self.flash_color = Some(color);
+                }
+                AppCommand::DrawText { origin, text, color } => {
+                    // Store text commands for rendering in update() where egui_ctx is available
+                    self.text_commands.push((origin, text, color));
                 }
             }
         }
