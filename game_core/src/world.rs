@@ -22,14 +22,27 @@ pub struct World {
 impl World {
     pub fn light(d:f32) -> f32 {
         let max_distance = Self::view_radius();
-        let d = d / max_distance;
-        let d = 1.0 - d;
-        if d < 0.0 {
-            0.0
-        } else if d > 1.0 {
-            1.0
+        
+        // Inverse square falloff with smooth cutoff
+        // This provides more realistic light attenuation
+        let normalized_d = d / max_distance;
+        
+        if normalized_d >= 1.0 {
+            return 0.0;
+        }
+        
+        // Inverse square law: intensity = 1 / (1 + k*d^2)
+        // k controls the falloff rate
+        let k = 16.0;
+        let attenuation = 1.0 / (1.0 + k * normalized_d * normalized_d);
+        
+        // Smooth cutoff near the edge to avoid hard boundaries
+        let edge_softness = 0.2;
+        if normalized_d > (1.0 - edge_softness) {
+            let edge_factor = (1.0 - normalized_d) / edge_softness;
+            attenuation * edge_factor
         } else {
-            d
+            attenuation
         }
     }
 
