@@ -264,6 +264,12 @@ impl ggsdk::GGApp for App {
                     color,
                     scale,
                 } => {
+                    // Cull sprites behind the camera
+                    let to_sprite = origin - player_pos;
+                    if to_sprite.dot(camera_dir) <= 0.0 {
+                        continue;
+                    }
+                    
                     let Some(texture) = g.assets.get::<GGAtlas>(&texture) else {
                         continue;
                     };
