@@ -23,17 +23,6 @@ pub fn generate_map_system(_: &TickEvent, ctx: &mut dyn Ctx) {
                             variant: crate::EntityVariant::Tree,
                         }));
                     }
-                    else if r == 1 {
-                        // spawn a zombie
-                        ctx.push_event(Event::Spawn(crate::event::SpawnEvent {
-                            pos: glam::Vec3::new(
-                                cell.x as f32 + 0.5,
-                                cell.y as f32 + 0.5,
-                                0.0,
-                            ),
-                            variant: crate::EntityVariant::Zombie,
-                        }));
-                    }
                 }
             }
         }

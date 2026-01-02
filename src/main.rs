@@ -110,22 +110,29 @@ impl ggsdk::GGApp for App {
         // Render text commands that were extracted in paint_glow
         let camera: &dyn Camera = &self.fps_camera;
         for (origin, text, color) in self.text_commands.drain(..) {
-            let screen_pos = camera.world_to_screen(origin);
-            let painter = g.egui_ctx.layer_painter(ggsdk::egui::LayerId::background());
-            let color32 = ggsdk::egui::Color32::from_rgba_premultiplied(
-                (color.x * 255.0) as u8,
-                (color.y * 255.0) as u8,
-                (color.z * 255.0) as u8,
-                (color.w * 255.0) as u8,
-            );
-            let pos = ggsdk::egui::Pos2::new(screen_pos.x, screen_pos.y);
-            painter.text(
-                pos,
-                ggsdk::egui::Align2::CENTER_CENTER,
-                &text,
-                ggsdk::egui::FontId::proportional(20.0),
-                color32,
-            );
+            // Check if the text position is in front of the camera
+            let to_point = origin - self.fps_camera.eye;
+            let forward = self.fps_camera.direction();
+            
+            // Only render if dot product is positive (in front of camera)
+            if to_point.dot(forward) > 0.0 {
+                let screen_pos = camera.world_to_screen(origin);
+                let painter = g.egui_ctx.layer_painter(ggsdk::egui::LayerId::background());
+                let color32 = ggsdk::egui::Color32::from_rgba_premultiplied(
+                    (color.x * 255.0) as u8,
+                    (color.y * 255.0) as u8,
+                    (color.z * 255.0) as u8,
+                    (color.w * 255.0) as u8,
+                );
+                let pos = ggsdk::egui::Pos2::new(screen_pos.x, screen_pos.y);
+                painter.text(
+                    pos,
+                    ggsdk::egui::Align2::CENTER_CENTER,
+                    &text,
+                    ggsdk::egui::FontId::proportional(20.0),
+                    color32,
+                );
+            }
         }
         
         // Render flash overlay if present

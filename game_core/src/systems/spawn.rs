@@ -35,6 +35,7 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
             e.radius = 0.1;
             e.texture = crate::Texture::Tree1;
             e.sprite_size = glam::Vec2::new(w, h);
+            e.floating_text = Some("Tree".to_string());
         },
         EntityVariant::Zombie => {
             let e = ctx.world_mut().entity_mut(id).unwrap();
