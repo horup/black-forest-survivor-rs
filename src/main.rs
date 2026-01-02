@@ -214,6 +214,11 @@ impl ggsdk::GGApp for App {
             .events
             .push_back(Event::PostTick(TickEvent { dt: g.dt }));
         systems::process(self);
+        
+        // Synchronize camera with player position after systems have processed
+        if let Some(player) = self.world.entities.get(self.world.player) {
+            self.fps_camera.eye = player.pos + Vec3::new(0.0, 0.0, 0.5);
+        }
     }
 
     fn paint_glow(&mut self, g: ggsdk::PaintGlowContext) {
@@ -221,7 +226,6 @@ impl ggsdk::GGApp for App {
             return;
         };
         let player_pos = player.pos;
-        self.fps_camera.eye = player_pos + Vec3::new(0.0, 0.0, 0.5);
         let camera_dir = self.fps_camera.direction();
         let gl = g.painter.gl();
 
