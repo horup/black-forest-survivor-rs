@@ -105,6 +105,12 @@ impl ggsdk::GGApp for App {
     }
 
     fn update(&mut self, g: ggsdk::UpdateContext) {
+        // Hide and capture the cursor
+        g.egui_ctx.set_cursor_icon(ggsdk::egui::CursorIcon::None);
+        g.egui_ctx.send_viewport_cmd(ggsdk::egui::ViewportCommand::CursorGrab(
+            ggsdk::egui::CursorGrab::Confined
+        ));
+        
         render::render_ui(&self.world, &g);
         
         // Render text commands that were extracted in paint_glow
