@@ -11,7 +11,7 @@ pub fn generate_map_system(_: &TickEvent, ctx: &mut dyn Ctx) {
                 let cell = grid_pos + glam::IVec2::new(x, y);
                 if ctx.world_mut().tiles.get(cell).is_none() {
                     ctx.world_mut().tiles.insert(cell, Tile { solid: false, entities: Default::default() });
-                    let r = ctx.rand_unsigned(6);
+                    let r = ctx.rand_unsigned(16);
                     if r == 0 {
                         // spawn a tree
                         ctx.push_event(Event::Spawn(crate::event::SpawnEvent {
@@ -31,7 +31,7 @@ pub fn generate_map_system(_: &TickEvent, ctx: &mut dyn Ctx) {
                                 0.0,
                             ),
                             variant: crate::EntityVariant::Zombie,
-                        }));    
+                        }));
                     }
                 }
             }

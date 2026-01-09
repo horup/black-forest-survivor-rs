@@ -15,6 +15,5 @@ pub fn despawn_system(event: &DespawnEvent, ctx: &mut dyn Ctx) {
     
     // Remove entity from the world
     if world.entities.remove(event.entity_id).is_some() {
-        dbg!("Despawned entity:", event.entity_id);
     }
 }

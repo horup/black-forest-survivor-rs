@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use crate::{CollisionEvent, TickEvent, event::Event};
+use crate::{CollisionEvent, Frame, TickEvent, event::Event};
 use super::Ctx;
 
 /// handles movement of entities in the world
@@ -25,6 +25,7 @@ pub fn movement_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
 
         if entity_vel.length() == 0.0 {
             if let Some(entity_mut) = world.entities.get_mut(entity_id) {
+                entity_mut.frame = Frame::Default;
                 if entity_mut.move_sinus != 0.0 {
                     entity_mut.move_sinus /= 2.0;
 
@@ -76,9 +77,19 @@ pub fn movement_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
         if let Some(entity_mut) = world.entities.get_mut(entity_id) {
             let old_pos = entity_mut.pos;
             let moved_distance = (entity_pos - old_pos).length();
-            entity_mut.move_distance_total += moved_distance;
+            entity_mut.move_distance_total += moved_distance * entity_mut.move_sinus_speed;
             entity_mut.pos = entity_pos;
+            let move_sinus = entity_mut.move_sinus;
             entity_mut.move_sinus = entity_mut.move_distance_total.sin();
+            if move_sinus.signum() != entity_mut.move_sinus.signum() {
+
+                // TODO seperate from this system
+                if move_sinus < 0.0 {
+                    entity_mut.frame = Frame::Walk1;
+                } else {
+                    entity_mut.frame = Frame::Walk2;
+                }
+            }
         }
 
         // add entity to new tile

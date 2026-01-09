@@ -19,6 +19,7 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
         max_speed: 0.0,
         floating_text: None,
         frame: Default::default(),
+        move_sinus_speed: 1.0,
     });
 
     match spawn_event.variant {
@@ -27,7 +28,8 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
             ctx.world_mut().player = id;
             let e = ctx.world_mut().entity_mut(id).unwrap();
             e.ability_timer_total_sec = 0.5;
-            e.max_speed = 5.0;
+            e.max_speed = 2.5;
+            e.move_sinus_speed = 2.5;
         },
         EntityVariant::Tree => {
             let w = ctx.rand_f32_range(1.0, 1.3);
@@ -42,7 +44,8 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
             let e = ctx.world_mut().entity_mut(id).unwrap();
             e.texture = crate::Texture::Zombie1;
             e.sprite_size = glam::Vec2::new(0.5, 1.0);
-            e.max_speed = 1.0;
+            e.max_speed = 0.5;
+            e.move_sinus_speed = 20.0;
             e.floating_text = Some("Zombie".to_string());
         }
         EntityVariant::Unknown => {}

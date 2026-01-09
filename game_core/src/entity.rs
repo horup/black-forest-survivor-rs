@@ -59,6 +59,9 @@ pub struct Entity {
     /// used for e.g. bobbing up and down while walking
     pub move_sinus:f32,
 
+    /// speed of the sinus movement
+    pub move_sinus_speed:f32,
+
     /// total distance moved
     /// reset when move_sinus is reset
     pub move_distance_total:f32,
