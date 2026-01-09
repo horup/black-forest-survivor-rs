@@ -109,14 +109,27 @@ impl ggsdk::GGApp for App {
     fn init(&mut self, g: ggsdk::InitContext) {
         self.glox.init(g.gl);
         self.fps_camera.eye = Vec3::new(0.0, 0.0, 0.5);
-        
-        g.assets
-            .load::<GGAtlas>("assets/textures/grass.png", "grass");
-        g.assets
-            .load::<GGAtlas>("assets/textures/torch.png", "torch");
-        g.assets.load::<GGAtlas>("assets/textures/axe.png", "axe");
-        g.assets.load::<GGAtlas>("assets/textures/tree.png", "tree");
-                            g.assets.load::<GGAtlas>("assets/textures/zombie.png", "zombie");
+
+        // Load all PNG textures from the textures directory
+        // TODO make crossplatform
+        if let Ok(entries) = std::fs::read_dir("assets/textures") {
+            for entry in entries.flatten() {
+                let path = entry.path();
+                if let Some(extension) = path.extension() {
+                    if extension == "png" {
+                        if let (Some(path_str), Some(file_name)) =
+                            (path.to_str(), path.file_stem().and_then(|s| s.to_str()))
+                        {
+                            let path_str = path_str.replace('\\', "/");
+                            dbg!(&path_str);
+                            dbg!(&file_name);
+
+                            g.assets.load::<GGAtlas>(&path_str, file_name);
+                        }
+                    }
+                }
+            }
+        }
 
         self.world
             .events
