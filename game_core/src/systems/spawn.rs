@@ -41,7 +41,7 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
         EntityVariant::Zombie => {
             let e = ctx.world_mut().entity_mut(id).unwrap();
             e.texture = crate::Texture::Zombie1;
-            e.sprite_size = glam::Vec2::new(0.5, 0.75);
+            e.sprite_size = glam::Vec2::new(0.5, 1.0);
             e.max_speed = 1.0;
             e.floating_text = Some("Zombie".to_string());
         }
