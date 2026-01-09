@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use glam::{IVec2, Vec4};
 
-use crate::{Texture, TickEvent, World, systems::Ctx};
+use crate::{Frame, Texture, TickEvent, World, systems::Ctx};
 
 pub fn render_system(event:&TickEvent, ctx: &mut dyn Ctx) {
     let Some(player) = ctx.world_mut().player() else { return; };
@@ -23,7 +23,7 @@ pub fn render_system(event:&TickEvent, ctx: &mut dyn Ctx) {
                 let v = origin - player_pos;
                 let c = World::light(v.length());
                 let color = Vec4::new(c, c, c, c);
-                ctx.draw_tile(origin, Texture::Grass, color);
+                ctx.draw_tile(origin, Texture::Grass, Frame::Default, color);
                 tiles.insert(cell, ());
             }
         }
@@ -48,8 +48,8 @@ pub fn render_system(event:&TickEvent, ctx: &mut dyn Ctx) {
             let sprite_size = e.sprite_size;
             let texture = e.texture;
             let floating_text = e.floating_text.clone();
-            
-            ctx.draw_sprite(origin, texture, color, sprite_size);
+            let frame = e.frame;
+            ctx.draw_sprite(origin, texture, frame, color, sprite_size);
             
             // Draw floating text if present
             if let Some(text) = floating_text {

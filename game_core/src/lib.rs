@@ -10,6 +10,8 @@ mod tile;
 pub use tile::*;
 mod math;
 pub use math::*;
+mod frame;
+pub use frame::*;
 
 mod texture;
 pub use texture::*;

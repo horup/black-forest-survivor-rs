@@ -1,12 +1,15 @@
 use std::collections::VecDeque;
 
 use game_core::systems::Ctx;
-use glow::HasContext;
 pub use game_core::*;
+use glow::HasContext;
 mod render;
 pub use render::*;
 
-use ggsdk::{GGAtlas, GGRunOptions, egui::{Key, TextureId}};
+use ggsdk::{
+    GGAtlas, GGRunOptions,
+    egui::{Key, TextureId},
+};
 use glam::{Vec2, Vec3, Vec4};
 use glox::{Camera, FirstPersonCamera, Glox};
 
@@ -23,12 +26,12 @@ struct App {
 enum AppCommand {
     DrawTile {
         origin: Vec3,
-        texture: String,
+        texture: &'static str,
         color: Vec4,
     },
     DrawSprite {
         origin: Vec3,
-        texture: String,
+        texture: &'static str,
         color: Vec4,
         scale: Vec2,
     },
@@ -42,12 +45,16 @@ enum AppCommand {
     },
 }
 
-fn texture_to_string(texture: Texture) -> String {
+fn texture_to_string(texture: Texture, frame: Frame) -> &'static str {
     match texture {
         Texture::None => Default::default(),
-        Texture::Tree1 => "tree".to_string(),
-        Texture::Zombie1 => "zombie".to_string(),
-        Texture::Grass => "grass".to_string(),
+        Texture::Tree1 => "tree",
+        Texture::Zombie1 => match frame {
+            Frame::Default => "zombie_0",
+            Frame::Walk1 => "zombie_1",
+            Frame::Walk2 => "zombie_1",
+        },
+        Texture::Grass => "grass",
     }
 }
 
@@ -60,29 +67,41 @@ impl Ctx for App {
         rand::random::<u32>()
     }
 
-    fn draw_tile(&mut self, origin: Vec3, texture: Texture, color: Vec4) {
+    fn draw_tile(&mut self, origin: Vec3, texture: Texture, frame: Frame, color: Vec4) {
         self.command_queue.push_back(AppCommand::DrawTile {
             origin,
-            texture: texture_to_string(texture),
+            texture: texture_to_string(texture, frame),
             color,
         });
     }
 
-    fn draw_sprite(&mut self, origin: Vec3, texture: Texture, color: Vec4, scale: Vec2) {
+    fn draw_sprite(
+        &mut self,
+        origin: Vec3,
+        texture: Texture,
+        frame: Frame,
+        color: Vec4,
+        scale: Vec2,
+    ) {
         self.command_queue.push_back(AppCommand::DrawSprite {
             origin,
-            texture: texture_to_string(texture),
+            texture: texture_to_string(texture, frame),
             color,
             scale,
         });
     }
 
     fn draw_flash(&mut self, color: Vec4) {
-        self.command_queue.push_back(AppCommand::DrawFlash { color });
+        self.command_queue
+            .push_back(AppCommand::DrawFlash { color });
     }
 
     fn draw_text(&mut self, origin: Vec3, text: String, color: Vec4) {
-        self.command_queue.push_back(AppCommand::DrawText { origin, text, color });
+        self.command_queue.push_back(AppCommand::DrawText {
+            origin,
+            text,
+            color,
+        });
     }
 }
 
@@ -90,14 +109,14 @@ impl ggsdk::GGApp for App {
     fn init(&mut self, g: ggsdk::InitContext) {
         self.glox.init(g.gl);
         self.fps_camera.eye = Vec3::new(0.0, 0.0, 0.5);
-
+        
         g.assets
             .load::<GGAtlas>("assets/textures/grass.png", "grass");
         g.assets
             .load::<GGAtlas>("assets/textures/torch.png", "torch");
         g.assets.load::<GGAtlas>("assets/textures/axe.png", "axe");
         g.assets.load::<GGAtlas>("assets/textures/tree.png", "tree");
-        g.assets.load::<GGAtlas>("assets/textures/zombie.png", "zombie");
+                            g.assets.load::<GGAtlas>("assets/textures/zombie.png", "zombie");
 
         self.world
             .events
@@ -107,19 +126,20 @@ impl ggsdk::GGApp for App {
     fn update(&mut self, g: ggsdk::UpdateContext) {
         // Hide and capture the cursor
         g.egui_ctx.set_cursor_icon(ggsdk::egui::CursorIcon::None);
-        g.egui_ctx.send_viewport_cmd(ggsdk::egui::ViewportCommand::CursorGrab(
-            ggsdk::egui::CursorGrab::Confined
-        ));
-        
+        g.egui_ctx
+            .send_viewport_cmd(ggsdk::egui::ViewportCommand::CursorGrab(
+                ggsdk::egui::CursorGrab::Confined,
+            ));
+
         render::render_ui(&self.world, &g);
-        
+
         // Render text commands that were extracted in paint_glow
         let camera: &dyn Camera = &self.fps_camera;
         for (origin, text, color) in self.text_commands.drain(..) {
             // Check if the text position is in front of the camera
             let to_point = origin - self.fps_camera.eye;
             let forward = self.fps_camera.direction();
-            
+
             // Only render if dot product is positive (in front of camera)
             if to_point.dot(forward) > 0.0 {
                 let screen_pos = camera.world_to_screen(origin);
@@ -140,7 +160,7 @@ impl ggsdk::GGApp for App {
                 );
             }
         }
-        
+
         // Render flash overlay if present
         if let Some(color) = self.flash_color {
             let painter = g.egui_ctx.layer_painter(ggsdk::egui::LayerId::background());
@@ -152,7 +172,7 @@ impl ggsdk::GGApp for App {
                 (color.w * 255.0) as u8,
             );
             painter.rect_filled(screen_rect, 0.0, color32);
-            
+
             // Clear flash after rendering
             self.flash_color = None;
         }
@@ -220,7 +240,7 @@ impl ggsdk::GGApp for App {
             .events
             .push_back(Event::PostTick(TickEvent { dt: g.dt }));
         systems::process(self);
-        
+
         // Synchronize camera with player position after systems have processed
         if let Some(player) = self.world.entities.get(self.world.player) {
             self.fps_camera.eye = player.pos + Vec3::new(0.0, 0.0, 0.5);
@@ -242,7 +262,7 @@ impl ggsdk::GGApp for App {
 
         let mut current_texture_id: Option<TextureId> = None;
         let mut draw = self.glox.draw_builder(gl, &self.fps_camera);
-        
+
         for command in self.command_queue.drain(..) {
             match command {
                 AppCommand::DrawTile {
@@ -254,7 +274,7 @@ impl ggsdk::GGApp for App {
                         continue;
                     };
                     let texture_id = texture.texture_id();
-                    
+
                     // If texture changed, finish current batch and start new one
                     if current_texture_id != Some(texture_id) {
                         if current_texture_id.is_some() {
@@ -265,7 +285,7 @@ impl ggsdk::GGApp for App {
                         draw.bind_texture(Some(texture));
                         current_texture_id = Some(texture_id);
                     }
-                    
+
                     draw.push_vertices(&glox::floor_vertices(origin, color));
                 }
                 AppCommand::DrawSprite {
@@ -279,12 +299,12 @@ impl ggsdk::GGApp for App {
                     if to_sprite.dot(camera_dir) <= 0.0 {
                         continue;
                     }
-                    
+
                     let Some(texture) = g.assets.get::<GGAtlas>(&texture) else {
                         continue;
                     };
                     let texture_id = texture.texture_id();
-                    
+
                     // If texture changed, finish current batch and start new one
                     if current_texture_id != Some(texture_id) {
                         if current_texture_id.is_some() {
@@ -295,20 +315,24 @@ impl ggsdk::GGApp for App {
                         draw.bind_texture(Some(texture));
                         current_texture_id = Some(texture_id);
                     }
-                    
+
                     draw.push_vertices(&glox::billboard_vertices(origin, color, camera_dir, scale));
                 }
                 AppCommand::DrawFlash { color } => {
                     // Store flash color to be rendered in the update method
                     self.flash_color = Some(color);
                 }
-                AppCommand::DrawText { origin, text, color } => {
+                AppCommand::DrawText {
+                    origin,
+                    text,
+                    color,
+                } => {
                     // Store text commands for rendering in update() where egui_ctx is available
                     self.text_commands.push((origin, text, color));
                 }
             }
         }
-        
+
         // Finish the final batch if any commands were processed
         if current_texture_id.is_some() {
             draw.finish();

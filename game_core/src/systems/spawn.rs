@@ -18,6 +18,7 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
         move_distance_total: 0.0,
         max_speed: 0.0,
         floating_text: None,
+        frame: Default::default(),
     });
 
     match spawn_event.variant {

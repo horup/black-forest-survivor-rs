@@ -1,4 +1,4 @@
-use crate::{Texture, World, event::Event, systems::render::render_system};
+use crate::{Frame, Texture, World, event::Event, frame, systems::render::render_system};
 
 mod ability;
 mod collision;
@@ -40,8 +40,8 @@ pub trait Ctx {
     fn rand_f32_range(&mut self, min: f32, max: f32) -> f32 {
         min + (max - min) * self.rand_f32()
     }
-    fn draw_tile(&mut self, origin:Vec3, texture:Texture, color: Vec4);
-    fn draw_sprite(&mut self, origin:Vec3, texture:Texture, color:Vec4, scale:Vec2);
+    fn draw_tile(&mut self, origin:Vec3, texture:Texture, frame:Frame, color: Vec4);
+    fn draw_sprite(&mut self, origin:Vec3, texture:Texture, frame:Frame, color:Vec4, scale:Vec2);
     /// Draws a full-screen flash with the specified color (RGBA, values 0.0-1.0).
     /// The alpha channel controls the opacity of the flash.
     fn draw_flash(&mut self, color: Vec4);

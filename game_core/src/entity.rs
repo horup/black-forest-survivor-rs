@@ -1,6 +1,6 @@
 use glam::{Vec2, Vec3};
 
-use crate::Texture;
+use crate::{Frame, Texture};
 
 #[derive(Clone, Copy)]
 pub enum EntityVariant {
@@ -26,6 +26,9 @@ pub struct Entity {
 
     /// Texture used to represent this entity
     pub texture: Texture,
+
+    /// Current animation frame of this entity
+    pub frame: Frame,
 
     /// Movement direction of this entity
     /// Normalized from 0..1
