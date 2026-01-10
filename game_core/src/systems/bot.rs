@@ -41,7 +41,7 @@ pub fn bot_system(_tick_event: &TickEvent, ctx: &mut dyn Ctx) {
         let contact_range = zombie_radius + 0.4; // zombie radius + player radius (0.4)
         if distance <= contact_range {
             // Activate ability when touching player
-       //     zombie.active_ability();
+            zombie.active_ability();
             // Stop moving when in contact
             zombie.move_dir = Vec3::ZERO;
         } else if distance > 0.0 {

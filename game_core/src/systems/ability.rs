@@ -1,6 +1,6 @@
 use glam::Vec2;
 
-use crate::{AbilityActivedEvent, DespawnEvent, TickEvent, event::Event, math};
+use crate::{AbilityActivedEvent, DespawnEvent, Frame, TickEvent, event::Event, math};
 use super::Ctx;
 
 pub fn ability_activated_system(event: &AbilityActivedEvent, ctx: &mut dyn Ctx) {
@@ -33,7 +33,8 @@ pub fn ability_activated_system(event: &AbilityActivedEvent, ctx: &mut dyn Ctx) 
             );
 
             if let Some(_intersection_point) = math::line_intersect(line1, line2) {
-                world.events.push_back(Event::Despawn(DespawnEvent { entity_id: other_entity_id }));
+                //world.events.push_back(Event::Despawn(DespawnEvent { entity_id: other_entity_id }));
+                dbg!("Ability hit entity {:?}", other_entity_id);
             }
         }
     }
@@ -53,9 +54,15 @@ pub fn ability_cooldown_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
                     world.events.push_back(Event::AbilityActived(AbilityActivedEvent {
                         entity_id,
                     }));
-                }
+                    e.frame = Frame::Attack;
+                } 
                 if e.ability_timer_sec < 0.0 {
                     e.ability_timer_sec = 0.0;
+                    e.frame = Frame::Default;
+                } else {
+                    if e.frame != Frame::Attack {
+                        e.frame = Frame::ReadyAttack;
+                    }
                 }
             }
         }
