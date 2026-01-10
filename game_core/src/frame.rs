@@ -5,6 +5,8 @@ pub enum Frame {
     Default,
     Walk1,
     Walk2,
+    ReadyAttack,
+    Attack
 }
 
 impl default::Default for Frame {
