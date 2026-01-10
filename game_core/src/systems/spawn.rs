@@ -11,7 +11,7 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
         solid: true,
         radius: 0.4,
         sprite_size: glam::Vec2::new(1.0, 1.0),
-        ability_activates_at_sec: 0.25,
+        ability_activates_at_sec: 0.5,
         ability_timer_sec: 0.0,
         ability_timer_total_sec: 1.0,
         move_sinus: 0.0,
@@ -28,6 +28,7 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
             ctx.world_mut().player = id;
             let e = ctx.world_mut().entity_mut(id).unwrap();
             e.ability_timer_total_sec = 0.5;
+            e.ability_activates_at_sec = 0.2;
             e.max_speed = 2.5;
             e.move_sinus_speed = 2.5;
         },

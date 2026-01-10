@@ -51,7 +51,7 @@ impl World {
     }
 
     pub fn view_radius() -> f32 {
-        8.0
+        6.0
     }
 
     /// Get all entity IDs in the world

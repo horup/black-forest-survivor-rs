@@ -1,6 +1,6 @@
 use glam::Vec2;
 
-use crate::{AbilityActivedEvent, DespawnEvent, Frame, TickEvent, event::Event, math};
+use crate::{AbilityActivedEvent, Frame, TickEvent, event::Event, math};
 use super::Ctx;
 
 pub fn ability_activated_system(event: &AbilityActivedEvent, ctx: &mut dyn Ctx) {
