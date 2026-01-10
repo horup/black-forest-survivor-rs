@@ -25,7 +25,9 @@ pub fn movement_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
 
         if entity_vel.length() == 0.0 {
             if let Some(entity_mut) = world.entities.get_mut(entity_id) {
-                entity_mut.frame = Frame::Default;
+                if entity_mut.is_ability_in_progress() == false {
+                    entity_mut.frame = Frame::Default;
+                }
                 if entity_mut.move_sinus != 0.0 {
                     entity_mut.move_sinus /= 2.0;
 
@@ -84,10 +86,12 @@ pub fn movement_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
             if move_sinus.signum() != entity_mut.move_sinus.signum() {
 
                 // TODO seperate from this system
-                if move_sinus < 0.0 {
-                    entity_mut.frame = Frame::Walk1;
-                } else {
-                    entity_mut.frame = Frame::Walk2;
+                if entity_mut.is_ability_in_progress() == false {
+                    if move_sinus < 0.0 {
+                        entity_mut.frame = Frame::Walk1;
+                    } else {
+                        entity_mut.frame = Frame::Walk2;
+                    }
                 }
             }
         }

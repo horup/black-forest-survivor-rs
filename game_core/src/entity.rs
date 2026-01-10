@@ -94,4 +94,9 @@ impl Entity {
             1.0 - (self.ability_timer_sec / self.ability_timer_total_sec)
         }
     }
+
+    /// Returns true if the ability is currently in progress
+    pub fn is_ability_in_progress(&self) -> bool {
+        self.ability_timer_sec > 0.0
+    }
 }
