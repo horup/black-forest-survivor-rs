@@ -71,6 +71,9 @@ pub struct Entity {
 
     /// Optional text to display floating over the entity
     pub floating_text: Option<String>,
+
+    /// Health of this entity
+    pub health: Health,
 }
 
 impl Entity {
@@ -98,5 +101,57 @@ impl Entity {
     /// Returns true if the ability is currently in progress
     pub fn is_ability_in_progress(&self) -> bool {
         self.ability_timer_sec > 0.0
+    }
+}
+
+#[derive(Clone)]
+pub struct Health {
+    pub current: f32,
+    pub max: f32,
+    pub can_receive_damage: bool,
+}
+
+impl Default for Health {
+    fn default() -> Self {
+        Health {
+            current: 100.0,
+            max: 100.0,
+            can_receive_damage: true,
+        }
+    }
+}
+
+impl Health {
+    pub fn new(max: f32) -> Self {
+        Health {
+            current: max,
+            max,
+            can_receive_damage: true,
+        }
+    }
+
+    pub fn indistructible() -> Self {
+        Health {
+            current: 0.0,
+            max: 0.0,
+            can_receive_damage: false,
+        }
+    }
+
+    pub fn apply_damage(&mut self, damage: f32) {
+        if self.can_receive_damage {
+            self.current -= damage;
+        }
+    }
+
+    pub fn heal(&mut self, amount: f32) {
+        self.current += amount;
+        if self.current > self.max {
+            self.current = self.max;
+        }
+    }
+
+    pub fn is_alive(&self) -> bool {
+        self.current > 0.0
     }
 }

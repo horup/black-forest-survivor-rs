@@ -1,4 +1,4 @@
-use crate::{Frame, Texture, World, event::Event, systems::render::render_system};
+use crate::{Frame, Texture, World, event::Event, systems::{ability::ability_hit_system, render::render_system}};
 
 mod ability;
 mod collision;
@@ -80,6 +80,9 @@ pub fn process(ctx: &mut dyn Ctx) {
             },
             Event::Despawn(despawn_event) => {
                 despawn_system(&despawn_event, ctx);
+            },
+            Event::AbilityHit(ability_hit_event) => {
+                ability_hit_system(&ability_hit_event, ctx);
             },
         }
     }

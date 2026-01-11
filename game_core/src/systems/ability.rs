@@ -3,8 +3,18 @@ use glam::Vec2;
 use crate::{AbilityActivedEvent, Frame, TickEvent, event::Event, math};
 use super::Ctx;
 
+pub fn ability_hit_system(event: &crate::AbilityHitEvent, ctx: &mut dyn Ctx) {
+    let world = ctx.world_mut();
+    let target_entity_id = event.target_entity_id;
+    if let Some(target_entity) = world.entities.get_mut(target_entity_id) {
+        target_entity.health.apply_damage(30.0);
+        dbg!(target_entity.health.current);
+    }
+}
+
 pub fn ability_activated_system(event: &AbilityActivedEvent, ctx: &mut dyn Ctx) {
     let world = ctx.world_mut();
+    let entity_id = event.entity_id;
     if let Some(e) = world.entities.get_mut(event.entity_id) {
         let facing = e.facing;
         let pos = e.pos;
@@ -34,7 +44,8 @@ pub fn ability_activated_system(event: &AbilityActivedEvent, ctx: &mut dyn Ctx) 
 
             if let Some(_intersection_point) = math::line_intersect(line1, line2) {
                 //world.events.push_back(Event::Despawn(DespawnEvent { entity_id: other_entity_id }));
-                dbg!("Ability hit entity {:?}", other_entity_id);
+                ctx.push_event(Event::AbilityHit(crate::AbilityHitEvent { entity_id: entity_id, target_entity_id: other_entity_id }));
+                break;
             }
         }
     }

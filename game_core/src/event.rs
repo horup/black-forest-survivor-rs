@@ -13,6 +13,7 @@ pub enum Event {
     Despawn(DespawnEvent),
     PlayerInput(PlayerInputEvent),
     AbilityActived(AbilityActivedEvent),
+    AbilityHit(AbilityHitEvent),
 }
 
 #[derive(Clone)]
@@ -55,6 +56,12 @@ pub struct SpawnEvent {
 #[derive(Clone)]
 pub struct AbilityActivedEvent {
     pub entity_id: DefaultKey,
+}
+
+#[derive(Clone)]
+pub struct AbilityHitEvent {
+    pub entity_id: DefaultKey,
+    pub target_entity_id: DefaultKey,
 }
 
 #[derive(Clone)]

@@ -1,4 +1,4 @@
-use crate::{Entity, EntityVariant};
+use crate::{Entity, EntityVariant, Health};
 use super::Ctx;
 
 pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
@@ -20,6 +20,7 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
         floating_text: None,
         frame: Default::default(),
         move_sinus_speed: 1.0,
+        health: Health::indistructible()
     });
 
     match spawn_event.variant {
@@ -31,6 +32,11 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
             e.ability_activates_at_sec = 0.2;
             e.max_speed = 2.5;
             e.move_sinus_speed = 2.5;
+            e.health = Health {
+                current: 100.0,
+                max: 100.0,
+                can_receive_damage: true,
+            }
         },
         EntityVariant::Tree => {
             let w = ctx.rand_f32_range(1.0, 1.3);
@@ -48,6 +54,11 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
             e.max_speed = 0.5;
             e.move_sinus_speed = 20.0;
             e.floating_text = Some("Zombie".to_string());
+            e.health = Health {
+                current: 30.0,
+                max: 30.0,
+                can_receive_damage: true,
+            }
         }
         EntityVariant::Unknown => {}
     }
