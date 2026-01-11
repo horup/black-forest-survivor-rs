@@ -1,6 +1,5 @@
-use crate::{Frame, Texture, World, event::Event, systems::{ability::ability_hit_system, render::render_system}};
+use crate::{Frame, Texture, World, event::Event, systems::{ability_hit::ability_hit_system, render::render_system}};
 
-mod ability;
 mod collision;
 mod generate_map;
 mod input;
@@ -11,8 +10,13 @@ mod spawn;
 mod render;
 mod despawn;
 mod bot;
+mod ability_hit;
+mod ability_activated;
+mod ability_cooldown;
 
-pub use ability::{ability_activated_system, ability_cooldown_system};
+
+pub use ability_activated::ability_activated_system;
+pub use ability_cooldown::ability_cooldown_system;
 pub use collision::collision_system;
 pub use generate_map::generate_map_system;
 pub use input::input_system;
