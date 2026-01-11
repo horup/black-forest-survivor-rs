@@ -15,5 +15,9 @@ pub fn ability_hit_system(event: &crate::AbilityHitEvent, ctx: &mut dyn Ctx) {
         if target_entity.health.is_alive() == false {
             world.events.push_back(Event::Despawn(crate::DespawnEvent { entity_id: target_entity_id }));
         }   
+
+        if ctx.world_mut().player == target_entity_id {
+            ctx.draw_flash(glam::Vec4::new(1.0, 0.0, 0.0, 0.5));
+        }
     }
 }
