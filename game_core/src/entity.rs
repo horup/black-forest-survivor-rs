@@ -89,6 +89,11 @@ impl Entity {
         }
     }
 
+    /// Resets the ability cooldown, making it immediately available
+    pub fn reset_ability(&mut self) {
+        self.ability_timer_sec = 0.0;
+    }
+
     /// Returns a value between 0.0 and 1.0 representing the progress of the ability cooldown
     pub fn ability_delta(&self) -> f32 {
         if self.ability_timer_total_sec <= 0.0 {
