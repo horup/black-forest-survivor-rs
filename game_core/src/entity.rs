@@ -7,7 +7,7 @@ pub enum EntityVariant {
     Unknown,
     Player,
     Tree,
-    Zombie
+    Zombie,
 }
 
 impl Default for EntityVariant {

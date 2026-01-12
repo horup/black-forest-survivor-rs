@@ -55,6 +55,7 @@ fn texture_to_string(texture: Texture, frame: Frame) -> &'static str {
             Frame::Walk2 => "zombie_2",
             Frame::ReadyAttack => "zombie_3",
             Frame::Attack => "zombie_4",
+            Frame::Dead => "zombie_5",
         },
         Texture::Grass => "grass",
     }

@@ -29,6 +29,9 @@ pub fn bot_system(_tick_event: &TickEvent, ctx: &mut dyn Ctx) {
         let Some(zombie) = world.entities.get_mut(zombie_id) else {
             continue;
         };
+        if zombie.health.is_alive() == false {
+            continue; // Dead zombies do not act
+        }
 
         let zombie_pos = zombie.pos;
         let zombie_radius = zombie.radius;

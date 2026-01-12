@@ -13,7 +13,10 @@ pub fn ability_hit_system(event: &crate::AbilityHitEvent, ctx: &mut dyn Ctx) {
         }
 
         if target_entity.health.is_alive() == false {
-            world.events.push_back(Event::Despawn(crate::DespawnEvent { entity_id: target_entity_id }));
+            target_entity.frame = Frame::Dead;
+            target_entity.solid = false;
+            target_entity.max_speed = 0.0;
+            target_entity.variant = crate::EntityVariant::Unknown;
         }   
 
         if ctx.world_mut().player == target_entity_id {

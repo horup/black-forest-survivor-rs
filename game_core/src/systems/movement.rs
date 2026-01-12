@@ -26,7 +26,9 @@ pub fn movement_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
         if entity_vel.length() == 0.0 {
             if let Some(entity_mut) = world.entities.get_mut(entity_id) {
                 if entity_mut.is_ability_in_progress() == false {
-                    entity_mut.frame = Frame::Default;
+                    if entity_mut.health.is_alive() {
+                        entity_mut.frame = Frame::Default;
+                    }
                 }
                 if entity_mut.move_sinus != 0.0 {
                     entity_mut.move_sinus /= 2.0;
