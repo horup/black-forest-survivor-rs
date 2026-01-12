@@ -9,12 +9,12 @@ use super::Ctx;
 pub fn bot_system(_tick_event: &TickEvent, ctx: &mut dyn Ctx) {
     let world = ctx.world_mut();
     
-    // Get player position
-    let player_pos = if let Some(player) = world.player() {
-        player.pos
-    } else {
-        return; // No player, no AI
-    };
+    let Some(player) = world.player() else { return };
+    let player_pos = player.pos;
+    let player_is_alive = player.health.is_alive();
+    if !player_is_alive  {
+        return; 
+    }
 
     // Collect all zombie entity IDs
     let mut zombie_ids = Vec::new();
@@ -30,12 +30,14 @@ pub fn bot_system(_tick_event: &TickEvent, ctx: &mut dyn Ctx) {
             continue;
         };
         if zombie.health.is_alive() == false {
-            continue; // Dead zombies do not act
+            // player is dead
+            // stop moving
+            zombie.move_dir = Vec3::ZERO;
+            continue;
         }
 
         let zombie_pos = zombie.pos;
         let zombie_radius = zombie.radius;
-        
         // Calculate direction to player
         let direction = player_pos - zombie_pos;
         let distance = direction.length();
