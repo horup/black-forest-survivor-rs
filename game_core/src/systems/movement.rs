@@ -69,10 +69,11 @@ pub fn movement_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
             let to_other = other_entity.pos - entity_pos;
             let dist = to_other.length();
             let min_dist = entity_radius + other_entity.radius;
+         
             if dist < min_dist && dist > 0.0 {
                 let overlap = min_dist - dist;
                 let correction = to_other.normalize() * overlap;
-                entity_pos += -correction * 0.5;
+                entity_pos += -correction;
                 colliding_entities.insert(*other_entity_id, ());
             }
         }
@@ -86,7 +87,6 @@ pub fn movement_system(tick_event: &TickEvent, ctx: &mut dyn Ctx) {
             let move_sinus = entity_mut.move_sinus;
             entity_mut.move_sinus = entity_mut.move_distance_total.sin();
             if move_sinus.signum() != entity_mut.move_sinus.signum() {
-
                 // TODO seperate from this system
                 if entity_mut.is_ability_in_progress() == false {
                     if move_sinus < 0.0 {
