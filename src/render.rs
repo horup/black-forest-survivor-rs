@@ -55,6 +55,33 @@ pub fn render_ui(world:&World, g: &ggsdk::UpdateContext) {
         let x = -cooldown * 3.0 *w;
         painter.atlas(&axe, 0, Rect::from_min_max(Pos2::new(screen_size.x - w + x, y), Pos2::new(screen_size.x + x, screen_size.y + y)), Color32::WHITE);
     }
+
+    // player health
+    use ggsdk::egui::{FontId, Align2};
+    let font_id = FontId::proportional(48.0);
+    
+    painter.text(
+        Pos2::new(30.0, screen_size.y - 30.0),
+        Align2::LEFT_BOTTOM,
+        "Health:",
+        font_id.clone(),
+        Color32::WHITE,
+    );
+    let health_value = format!("{:.0}", player.health.current);
+    let text_color = if player.health.current / player.health.max > 0.5 {
+        Color32::from_rgb(100, 255, 100)
+    } else if player.health.current / player.health.max > 0.25 {
+        Color32::from_rgb(255, 255, 100)
+    } else {
+        Color32::from_rgb(255, 100, 100)
+    };
+    painter.text(
+        Pos2::new(180.0, screen_size.y - 30.0),
+        Align2::LEFT_BOTTOM,
+        health_value,
+        font_id,
+        text_color,
+    );
    
 }
 
