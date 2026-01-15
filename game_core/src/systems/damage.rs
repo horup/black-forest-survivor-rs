@@ -1,4 +1,4 @@
-use crate::{ApplyDamageEvent, EntityVariant, Frame, systems::Ctx};
+use crate::{ApplyDamageEvent, EntityVariant, Fade, Frame, systems::Ctx};
 
 pub fn damage_system(event: &ApplyDamageEvent, ctx: &mut dyn Ctx) {
     let world = ctx.world_mut();
@@ -16,6 +16,10 @@ pub fn damage_system(event: &ApplyDamageEvent, ctx: &mut dyn Ctx) {
                 entity.max_speed = 0.0;
                 entity.variant = EntityVariant::Unknown;
                 entity.frame = Frame::Dead;
+
+                if world.player == event.entity_id {
+                    world.start_fade(Fade::Out, 2.0);
+                }
             }
         }
     }

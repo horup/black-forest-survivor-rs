@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use glam::{IVec2, Vec4};
 
-use crate::{Frame, Texture, TickEvent, World, systems::Ctx};
+use crate::{Fade, Frame, Texture, TickEvent, World, systems::Ctx};
 
 pub fn render_system(event:&TickEvent, ctx: &mut dyn Ctx) {
     let Some(player) = ctx.world_mut().player() else { return; };
@@ -59,10 +59,11 @@ pub fn render_system(event:&TickEvent, ctx: &mut dyn Ctx) {
         }
     }
     
-    // Update and render fade-in effect
-    ctx.world_mut().fade_in_time += event.dt;
-    if ctx.world_mut().fade_in_time < 2.0 {
-        let alpha = (1.0 - (ctx.world_mut().fade_in_time / 2.0)).clamp(0.0, 1.0);
-        ctx.draw_flash(Vec4::new(0.0, 0.0, 0.0, alpha));
-    }
+    // Update and render fade effect
+    ctx.world_mut().fade_timer.tick(event.dt);
+    let alpha = match ctx.world_mut().fade {
+        Fade::In => (1.0 - ctx.world_mut().fade_timer.progress()).clamp(0.0, 1.0),
+        Fade::Out => ctx.world_mut().fade_timer.progress().clamp(0.0, 1.0),
+    };
+    ctx.draw_flash(Vec4::new(0.0, 0.0, 0.0, alpha));
 }

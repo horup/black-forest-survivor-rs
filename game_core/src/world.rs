@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use glam::IVec2;
 use slotmap::DefaultKey;
 
-use crate::{Event, entity::Entity, tile::Tile};
+use crate::{Event, Timer, entity::Entity, tile::Tile};
 
 #[derive(Default, Clone)]
 pub struct World {
@@ -15,11 +15,27 @@ pub struct World {
     pub player: slotmap::DefaultKey,
     /// Unprocessed events
     pub events:VecDeque<Event>,
-    /// Time elapsed for fade-in effect (in seconds)
-    pub fade_in_time: f32,
+    pub fade_timer: Timer,
+    pub fade:Fade
 }
 
+#[derive(Clone)]
+pub enum Fade {
+    In,
+    Out,
+}
+impl Default for Fade {
+    fn default() -> Self {
+        Fade::In
+    }
+}   
+
 impl World {
+    pub fn start_fade(&mut self, fade: Fade, duration:f32) {
+        self.fade = fade;
+        self.fade_timer = Timer::new(duration, false);
+    }
+
     pub fn light(d:f32) -> f32 {
         let max_distance = Self::view_radius();
         
@@ -73,6 +89,7 @@ impl World {
     pub fn clear(&mut self) {
         self.entities.clear();
         self.tiles = Default::default();
+        self.start_fade(Fade::In, 1.0);
     }
 
     /// Get a mutable reference to the player entity
