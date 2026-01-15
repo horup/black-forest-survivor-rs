@@ -260,6 +260,7 @@ impl ggsdk::GGApp for App {
         // Synchronize camera with player position after systems have processed
         if let Some(player) = self.world.entities.get(self.world.player) {
             self.fps_camera.eye = player.pos + Vec3::new(0.0, 0.0, 0.5);
+            self.fps_camera.yaw = player.facing;
         }
     }
 
