@@ -14,6 +14,14 @@ pub enum Event {
     PlayerInput(PlayerInputEvent),
     AbilityActived(AbilityActivedEvent),
     AbilityHit(AbilityHitEvent),
+    DamageEntity(ApplyDamageEvent),
+}
+
+#[derive(Clone)]
+pub struct ApplyDamageEvent {
+    pub entity_id: DefaultKey,
+    pub other_entity_id: DefaultKey,
+    pub damage_amount: f32,
 }
 
 #[derive(Clone)]

@@ -1,4 +1,4 @@
-use crate::{Frame, Texture, World, event::Event, systems::{ability_hit::ability_hit_system, render::render_system}};
+use crate::{Frame, Texture, World, event::Event, systems::{ability_hit::ability_hit_system, damage::damage_system, render::render_system}};
 
 mod collision;
 mod generate_map;
@@ -13,7 +13,7 @@ mod bot;
 mod ability_hit;
 mod ability_activated;
 mod ability_cooldown;
-
+mod damage;
 
 pub use ability_activated::ability_activated_system;
 pub use ability_cooldown::ability_cooldown_system;
@@ -87,6 +87,9 @@ pub fn process(ctx: &mut dyn Ctx) {
             },
             Event::AbilityHit(ability_hit_event) => {
                 ability_hit_system(&ability_hit_event, ctx);
+            },
+            Event::DamageEntity(damage_entity_event) => {
+                damage_system(&damage_entity_event, ctx);
             },
         }
     }
