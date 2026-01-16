@@ -143,8 +143,8 @@ impl Health {
 
     pub fn indistructible() -> Self {
         Health {
-            current: 0.0,
-            max: 0.0,
+            current: 1.0,
+            max: 1.0,
             can_receive_damage: false,
         }
     }

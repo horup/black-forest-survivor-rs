@@ -20,6 +20,8 @@ pub fn damage_system(event: &ApplyDamageEvent, ctx: &mut dyn Ctx) {
                 if world.player == event.entity_id {
                     world.start_fade(Fade::Out, 2.0);
                 }
+            } else {
+                entity.flash_timer.restart();
             }
         }
     }

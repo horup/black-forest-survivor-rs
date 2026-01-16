@@ -23,11 +23,11 @@ impl Timer {
         }
     }
 
-    pub fn is_finished(&self) -> bool {
+    pub fn finished(&self) -> bool {
         self.finished
     }
 
-    pub fn reset(&mut self) {
+    pub fn restart(&mut self) {
         self.elapsed = 0.0;
         self.finished = false;
     }

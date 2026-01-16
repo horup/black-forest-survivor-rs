@@ -44,7 +44,8 @@ pub fn render_system(event:&TickEvent, ctx: &mut dyn Ctx) {
             let v = origin - player_pos;
             let d = v.length();
             let c = World::light(d);
-            let color = e.tint;
+            let color = e.tint * c;
+            let color = color.truncate().extend(1.0);
             let sprite_size = e.sprite_size;
             let texture = e.texture;
             let floating_text = e.floating_text.clone();

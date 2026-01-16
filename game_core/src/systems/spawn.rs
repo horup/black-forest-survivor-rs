@@ -32,14 +32,15 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
             ctx.world_mut().player = id;
             let e = ctx.world_mut().entity_mut(id).unwrap();
             e.ability_timer_total_sec = 0.5;
-            e.ability_activates_at_sec = 0.2;
+            e.ability_activates_at_sec = 0.4;
             e.max_speed = 2.5;
             e.move_sinus_speed = 2.5;
             e.health = Health {
                 current: 100.0,
                 max: 100.0,
                 can_receive_damage: true,
-            }
+            };
+            e.health = Health::indistructible();
         },
         EntityVariant::Tree => {
             let w = ctx.rand_f32_range(1.0, 1.3);
