@@ -1,4 +1,4 @@
-use glam::{Vec2, Vec3};
+use glam::{Vec2, Vec3, Vec4};
 
 use crate::{Frame, Texture};
 
@@ -74,6 +74,9 @@ pub struct Entity {
 
     /// Health of this entity
     pub health: Health,
+
+    /// Color tint applied to this entity
+    pub tint: Vec4
 }
 
 impl Entity {

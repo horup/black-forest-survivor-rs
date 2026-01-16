@@ -1,5 +1,6 @@
 use crate::{Entity, EntityVariant, Health};
 use super::Ctx;
+use glam::Vec4;
 
 pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
     let id = ctx.world_mut().entities.insert(Entity {
@@ -20,7 +21,8 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
         floating_text: None,
         frame: Default::default(),
         move_sinus_speed: 1.0,
-        health: Health::indistructible()
+        health: Health::indistructible(),
+        tint: Vec4::ONE
     });
 
     match spawn_event.variant {
