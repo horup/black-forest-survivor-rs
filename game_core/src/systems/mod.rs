@@ -1,4 +1,4 @@
-use crate::{Frame, Texture, World, event::Event, systems::{ability_hit::ability_hit_system, damage::damage_system, render::render_system}};
+use crate::{Frame, Texture, World, event::Event, systems::{ability_hit::ability_hit_system, damage::damage_system, render::render_system, tick::tick_system}};
 
 mod collision;
 mod generate_map;
@@ -14,6 +14,7 @@ mod ability_hit;
 mod ability_activated;
 mod ability_cooldown;
 mod damage;
+mod tick;
 
 pub use ability_activated::ability_activated_system;
 pub use ability_cooldown::ability_cooldown_system;
@@ -60,6 +61,7 @@ pub fn process(ctx: &mut dyn Ctx) {
             Event::Tick(tick_event) => {
                 generate_map_system(&tick_event, ctx);
                 map_entities_to_tiles_system(&tick_event, ctx);
+                tick_system(&tick_event, ctx);
                 bot_system(&tick_event, ctx);
                 movement_system(&tick_event, ctx);
                 ability_cooldown_system(&tick_event, ctx);

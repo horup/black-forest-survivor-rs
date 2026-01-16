@@ -1,4 +1,4 @@
-use crate::{Entity, EntityVariant, Health};
+use crate::{Entity, EntityVariant, Health, Timer};
 use super::Ctx;
 use glam::Vec4;
 
@@ -22,7 +22,8 @@ pub fn spawn_system(spawn_event: &crate::event::SpawnEvent, ctx: &mut dyn Ctx) {
         frame: Default::default(),
         move_sinus_speed: 1.0,
         health: Health::indistructible(),
-        tint: Vec4::ONE
+        tint: Vec4::ONE,
+        flash_timer: Timer::new(0.25, true),
     });
 
     match spawn_event.variant {

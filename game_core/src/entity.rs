@@ -1,6 +1,6 @@
 use glam::{Vec2, Vec3, Vec4};
 
-use crate::{Frame, Texture};
+use crate::{Frame, Texture, Timer};
 
 #[derive(Clone, Copy)]
 pub enum EntityVariant {
@@ -76,7 +76,10 @@ pub struct Entity {
     pub health: Health,
 
     /// Color tint applied to this entity
-    pub tint: Vec4
+    pub tint: Vec4,
+
+    /// Timer for flash effects (e.g., when taking damage)
+    pub flash_timer:Timer
 }
 
 impl Entity {
